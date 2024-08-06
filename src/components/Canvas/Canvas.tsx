@@ -2,14 +2,16 @@ import React, { ReactNode } from 'react';
 import { Stage, Layer, Image } from 'react-konva';
 import useImage from 'use-image';
 
+import spaceBackgroundImg from '../../assets/images/space-background.jpg';
+
 interface CanvasProps {
   width: number;
   height: number;
   children: ReactNode;
 }
 
-const Canvas: React.FC<CanvasProps> = ({ width, height, children }) => {
-  const [background] = useImage('/assets/images/space-background.jpg');
+export const Canvas: React.FC<CanvasProps> = ({ width, height, children }) => {
+  const [background] = useImage(spaceBackgroundImg);
 
   return (
     <Stage width={width} height={height}>
@@ -21,4 +23,3 @@ const Canvas: React.FC<CanvasProps> = ({ width, height, children }) => {
   );
 };
 
-export default Canvas;

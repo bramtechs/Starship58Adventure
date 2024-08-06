@@ -1,17 +1,16 @@
-import { Star } from 'react-konva';
-import Canvas from './components/Canvas';
+import {Canvas, Obstacle, Planet, Rocket, CommandCenter} from './components';
 import { CANVAS_HEIGHT, CANVAS_WIDTH } from './utils/constants';
 
 function App() {
   return (
+    <div>
     <Canvas width={CANVAS_WIDTH} height={CANVAS_HEIGHT}>
-      <Star
-        numPoints={5}
-        innerRadius={20}
-        outerRadius={40}
-        fill='#89b717'
-      ></Star>
+      <Rocket x={0} y={500}></Rocket>
+      <Planet x={500} y={0}></Planet>
+      <Obstacle x={300} y={300} rotation={0} dx={0} dy={0}></Obstacle>
     </Canvas>
+    <CommandCenter onLaunch={() => console.log('LAUNCH')}></CommandCenter>
+    </div>
   );
 }
 
