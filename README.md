@@ -2,6 +2,8 @@
 
 Welcome aboard Starship 58, cadet! This React TypeScript app simulates a journey through space, challenging you to navigate a rocket through cosmic obstacles to reach a distant planet.
 
+![alt text](./src/assets/images/game-screenshot.png)
+
 ## Getting Started
 
 ### 1. Clone this repository:
