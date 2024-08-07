@@ -64,6 +64,11 @@ const LaunchButton = styled.button`
     background-color: darkred;
     transform: scale(1.05);
   }
+  &:disabled {
+    background-color: gray;
+    cursor: default;
+    transform: none; // Remove transform effect when disabled
+  }
 `;
 
 const VerticalLine = styled.div`
@@ -78,9 +83,13 @@ const Title = styled.h2`
 
 interface CommandCenterProps {
   onLaunch: () => void;
+  isGameRunning: boolean;
 }
 
-export const CommandCenter: React.FC<CommandCenterProps> = ({ onLaunch }) => {
+export const CommandCenter: React.FC<CommandCenterProps> = ({
+  onLaunch,
+  isGameRunning,
+}) => {
   return (
     <CommandCenterWrapper>
       <BackgroundImage />
@@ -91,7 +100,9 @@ export const CommandCenter: React.FC<CommandCenterProps> = ({ onLaunch }) => {
           {/* Form will be implemented by students */}
           <p>Form goes here</p>
         </FormArea>
-        <LaunchButton onClick={onLaunch}>LAUNCH</LaunchButton>
+        <LaunchButton onClick={onLaunch} disabled={isGameRunning}>
+          LAUNCH
+        </LaunchButton>
       </Content>
     </CommandCenterWrapper>
   );

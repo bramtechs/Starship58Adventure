@@ -37,8 +37,10 @@ const ScreenHalf = styled.div`
 `;
 
 const App: React.FC = () => {
+  const [isRunning, setIsRunning] = useState(false);
   const [direction, setDirection] = useState<Direction>({ x: 0, y: -1 });
   const [missionSuccess, setMissionSuccess] = useState<boolean>(false);
+
   const createInitialState = (): GameState => ({
     rocket: { x: 0, y: CANVAS_HEIGHT - 100 },
     planet: { x: CANVAS_WIDTH - 105, y: 5 },
@@ -54,6 +56,7 @@ const App: React.FC = () => {
     oxygen: INITIAL_OXYGEN,
     gameOver: false,
   });
+
   const updateGameState = useCallback(
     (prevState: GameState): GameState => {
       if (prevState.gameOver) return prevState;
@@ -116,19 +119,24 @@ const App: React.FC = () => {
     },
     [direction]
   );
+
   const [gameState, startGame, stopGame, resetGame] = useGameLoop(
     createInitialState(),
     updateGameState
   );
+
   const handleLaunch = () => {
     startGame();
+    setIsRunning(true);
   };
+
   const handleRestart = () => {
     const newInitialState = createInitialState();
     resetGame(newInitialState);
     setMissionSuccess(false);
-    startGame();
+    setIsRunning(false);
   };
+
   return (
     <AppWrapper>
       <ScreenHalf>
@@ -155,7 +163,7 @@ const App: React.FC = () => {
       </ScreenHalf>
       <VerticalLine />
       <ScreenHalf>
-        <CommandCenter onLaunch={handleLaunch} />
+        <CommandCenter onLaunch={handleLaunch} isGameRunning={isRunning} />
       </ScreenHalf>
     </AppWrapper>
   );
