@@ -10,13 +10,18 @@ const BackgroundImage = styled.div`
     background-image: url(${commandCenterBackgroundImg});
     background-size: cover;
     background-position: center;
-    filter: blur(3px);  
+    transform: scale(1.05);
 `;
 
 const Content = styled.div`
     position: relative;
     z-index: 1;
-    padding: 20px;
+    margin: 40px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center; 
+    align-items: center;
+    flex-grow: 1;
 `;
 
 const CommandCenterWrapper = styled.div`
@@ -24,26 +29,49 @@ const CommandCenterWrapper = styled.div`
     width: 100%;  
     height: 100%;
     overflow: hidden; 
+    display: flex;
+    flex-direction: column;
 `;
 
 const FormArea = styled.div`
-  background-color: #ffffff;
+  background: white;
   border-radius: 10px;
+  padding: 20px;
+  border: 4px solid lightgray; 
+
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
-  padding: 20px;
+  width: 100%;
+  flex-grow: 1;
 `;
 
 const LaunchButton = styled.button`
-  background-color: #ff4136;
+  background-color: red;  
   color: white;
-  font-size: 24px;
-  padding: 10px 20px;
+  font-size: 20px;
+  font-weight: bold;
+  padding: 15px 30px;
   border: none;
   border-radius: 10px;
   cursor: pointer;
+  transition: background-color 0.3s, transform 0.2s;
+  margin: 30px;
+
+  &:hover {
+    background-color: darkred;
+    transform: scale(1.05);
+  }
 `;
+
+const VerticalLine = styled.div`
+    height: 4px; 
+    width: 100%; 
+    background-color: lightgray;
+`;
+
+const Title = styled.h2`
+    text-align: center;
+`
 
 interface CommandCenterProps {
   onLaunch: () => void;
@@ -55,7 +83,8 @@ export const CommandCenter: React.FC<CommandCenterProps> = ({ onLaunch }) => {
       <BackgroundImage />
       <Content>
         <FormArea>
-        <h2>Command Center</h2>
+        <Title>Command Center</Title>
+        <VerticalLine/>
           {/* Form will be implemented by students */}
           <p>Form goes here</p>
         </FormArea>
