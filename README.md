@@ -6,7 +6,9 @@ Welcome aboard Starship 58, cadet! This React TypeScript app simulates a journey
 
 ### 1. Clone this repository:
 
-`git clone https://github.com/your-username/starship-58-adventure.git`
+//TODO: add correct git url
+
+`git clone https://github.com/your-username/htf-starship-58-adventure.git`
 
 `cd starship-58-adventure`
 
