@@ -19,6 +19,10 @@ import {
   INITIAL_OXYGEN,
 } from './utils/constants';
 import { GameState, Direction } from './types';
+
+import planetXImg from './assets/images/planet.png'
+import earthImg from './assets/images/earth.png'
+
 const VerticalLine = styled.div`
   width: 5px;
   height: 100vh;
@@ -42,8 +46,9 @@ const App: React.FC = () => {
   const [missionSuccess, setMissionSuccess] = useState<boolean>(false);
 
   const createInitialState = (): GameState => ({
-    rocket: { x: 0, y: CANVAS_HEIGHT - 100 },
-    planet: { x: CANVAS_WIDTH - 105, y: 5 },
+    rocket: { x: 23, y: CANVAS_HEIGHT - 160 },
+    earth: { x: 0, y: CANVAS_HEIGHT - 100 },
+    planetX: { x: CANVAS_WIDTH - 105, y: 5 },
     obstacles: Array(5)
       .fill(null)
       .map(() => ({
@@ -90,7 +95,7 @@ const App: React.FC = () => {
 
       const reachesPlanet = checkCollision(
         { ...newState.rocket, width: 50, height: 100 },
-        { ...newState.planet, width: 100, height: 100 }
+        { ...newState.planetX, width: 100, height: 100 }
       );
 
       // Update oxygen
@@ -141,8 +146,9 @@ const App: React.FC = () => {
     <AppWrapper>
       <ScreenHalf>
         <Canvas width={CANVAS_WIDTH} height={CANVAS_HEIGHT}>
+          <Planet x={gameState.earth.x} y={gameState.earth.y} planetImg={earthImg} />
           <Rocket x={gameState.rocket.x} y={gameState.rocket.y} />
-          <Planet x={gameState.planet.x} y={gameState.planet.y} />
+          <Planet x={gameState.planetX.x} y={gameState.planetX.y} planetImg={planetXImg} />
           {gameState.obstacles.map((obstacle, index) => (
             <Obstacle
               key={index}

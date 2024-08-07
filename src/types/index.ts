@@ -11,7 +11,8 @@ export interface Position {
   
   export interface GameState {
     rocket: Position;
-    planet: Position;
+    planetX: Position;
+    earth: Position;
     obstacles: Obstacle[];
     oxygen: number;
     gameOver: boolean;
