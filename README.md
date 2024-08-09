@@ -12,7 +12,7 @@ Welcome aboard Starship 58, cadet! This React TypeScript app simulates a journey
 
 `cd starship-58-adventure`
 
-
+`git checkout develop`
 
 ### 2. Install dependencies:
 
