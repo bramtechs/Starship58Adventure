@@ -4,7 +4,6 @@ import useImage from 'use-image';
 
 import { Position } from '../../types';
 
-
 interface PlanetProps extends Position {
   planetImg: string
 }
