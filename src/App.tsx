@@ -56,6 +56,7 @@ const App: React.FC = () => {
   const [isRunning, setIsRunning] = useState(false);
   const [direction, setDirection] = useState<Direction>({ x: 0, y: -1 });
   const [missionSuccess, setMissionSuccess] = useState<boolean>(false);
+  const [rotation, setRotation] = useState<number>(0);
 
   const createInitialState = (): GameState => ({
     rocket: { x: 23, y: CANVAS_HEIGHT - 160 },
@@ -155,7 +156,9 @@ const App: React.FC = () => {
   };
 
   return (
-    <GameStateContext.Provider value={gameState}>
+    <GameStateContext.Provider
+      value={{ gameState, setDirection, rotation, setRotation }}
+    >
       <AppWrapper>
         <BackgroundImage />
         <ScreenHalf>
@@ -165,7 +168,11 @@ const App: React.FC = () => {
               y={gameState.earth.y}
               planetImg={earthImg}
             />
-            <Rocket x={gameState.rocket.x} y={gameState.rocket.y} />
+            <Rocket
+              x={gameState.rocket.x}
+              y={gameState.rocket.y}
+              rotation={rotation}
+            />
             <Planet
               x={gameState.planetX.x}
               y={gameState.planetX.y}
@@ -197,4 +204,5 @@ const App: React.FC = () => {
     </GameStateContext.Provider>
   );
 };
+
 export default App;

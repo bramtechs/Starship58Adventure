@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import React, { useContext, useState } from 'react';
 import styled from 'styled-components';
 import { GameStateContext } from '../../contexts/GameStateContext';
 
@@ -79,7 +79,29 @@ export const CommandCenter: React.FC<CommandCenterProps> = ({
   onLaunch,
   isGameRunning,
 }) => {
-  const gameState = useContext(GameStateContext);
+  const [inputRotation, setInputRotation] = useState<number>(0);
+
+  const { gameState, setDirection, setRotation } =
+    useContext(GameStateContext)!;
+
+  // State for form inputs
+  const [inputX, setInputX] = useState<number>(0);
+  const [inputY, setInputY] = useState<number>(-1);
+
+  // Handler for form submission
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+
+    // Normalize the direction vector
+    const magnitude = Math.sqrt(inputX * inputX + inputY * inputY);
+    if (magnitude === 0) return;
+    const normalizedDirection = {
+      x: inputX / magnitude,
+      y: inputY / magnitude,
+    };
+    setRotation(inputRotation);
+    setDirection(normalizedDirection);
+  };
 
   return (
     <CommandCenterWrapper>
@@ -97,8 +119,43 @@ export const CommandCenter: React.FC<CommandCenterProps> = ({
               </p>
             </>
           )}
-          {/* Form will be implemented by students */}
-          <pre>Form goes here</pre>
+
+          {/* Students can build their form here */}
+          {/* This form is just to demonstrate how it works, but we’ll need to remove it so that students can build it themselves.*/}
+          <form onSubmit={handleSubmit}>
+            <div>
+              <label>
+                Direction X:
+                <input
+                  type='number'
+                  value={inputX}
+                  onChange={(e) => setInputX(parseFloat(e.target.value))}
+                />
+              </label>
+            </div>
+            <div>
+              <label>
+                Direction Y:
+                <input
+                  type='number'
+                  value={inputY}
+                  onChange={(e) => setInputY(parseFloat(e.target.value))}
+                />
+              </label>
+            </div>
+            <div>
+              <label>
+                Rotation (degrees):
+                <input
+                  type='number'
+                  value={inputRotation}
+                  onChange={(e) => setInputRotation(parseFloat(e.target.value))}
+                />
+              </label>
+            </div>
+            <button type='submit'>Set Direction</button>
+          </form>
+
         </FormArea>
         <LaunchButton onClick={onLaunch} disabled={isGameRunning}>
           LAUNCH
