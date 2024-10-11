@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import styled from 'styled-components';
+import { GameStateContext } from '../../contexts/GameStateContext';
 
 const Content = styled.div`
   position: relative;
@@ -78,14 +79,26 @@ export const CommandCenter: React.FC<CommandCenterProps> = ({
   onLaunch,
   isGameRunning,
 }) => {
+  const gameState = useContext(GameStateContext);
+
   return (
     <CommandCenterWrapper>
       <Content>
         <FormArea>
           <Title>Command Center</Title>
           <VerticalLine />
+
+          {gameState && (
+            <>
+              <p>Oxygen Level: {gameState.oxygen.toFixed(2)}</p>
+              <p>
+                Rocket Position: ({gameState.rocket.x.toFixed(2)},{' '}
+                {gameState.rocket.y.toFixed(2)})
+              </p>
+            </>
+          )}
           {/* Form will be implemented by students */}
-          <p>Form goes here</p>
+          <pre>Form goes here</pre>
         </FormArea>
         <LaunchButton onClick={onLaunch} disabled={isGameRunning}>
           LAUNCH

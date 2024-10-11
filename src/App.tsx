@@ -19,6 +19,7 @@ import {
   INITIAL_OXYGEN,
 } from './utils/constants';
 import { GameState, Direction } from './types';
+import { GameStateContext } from './contexts/GameStateContext';
 
 import planetXImg from './assets/images/planet.png';
 import earthImg from './assets/images/earth.png';
@@ -154,44 +155,46 @@ const App: React.FC = () => {
   };
 
   return (
-    <AppWrapper>
-            <BackgroundImage />
-      <ScreenHalf>
-        <Canvas width={CANVAS_WIDTH} height={CANVAS_HEIGHT}>
-          <Planet
-            x={gameState.earth.x}
-            y={gameState.earth.y}
-            planetImg={earthImg}
-          />
-          <Rocket x={gameState.rocket.x} y={gameState.rocket.y} />
-          <Planet
-            x={gameState.planetX.x}
-            y={gameState.planetX.y}
-            planetImg={planetXImg}
-          />
-          {gameState.obstacles.map((obstacle, index) => (
-            <Obstacle
-              key={index}
-              x={obstacle.x}
-              y={obstacle.y}
-              rotation={obstacle.rotation}
-              dx={obstacle.dx}
-              dy={obstacle.dy}
+    <GameStateContext.Provider value={gameState}>
+      <AppWrapper>
+        <BackgroundImage />
+        <ScreenHalf>
+          <Canvas width={CANVAS_WIDTH} height={CANVAS_HEIGHT}>
+            <Planet
+              x={gameState.earth.x}
+              y={gameState.earth.y}
+              planetImg={earthImg}
             />
-          ))}
-        </Canvas>
-        {gameState.gameOver && (
-          <EndgameNotification
-            success={missionSuccess}
-            onRestart={handleRestart}
-          />
-        )}
-      </ScreenHalf>
-      <VerticalLine />
-      <ScreenHalf>
-        <CommandCenter onLaunch={handleLaunch} isGameRunning={isRunning} />
-      </ScreenHalf>
-    </AppWrapper>
+            <Rocket x={gameState.rocket.x} y={gameState.rocket.y} />
+            <Planet
+              x={gameState.planetX.x}
+              y={gameState.planetX.y}
+              planetImg={planetXImg}
+            />
+            {gameState.obstacles.map((obstacle, index) => (
+              <Obstacle
+                key={index}
+                x={obstacle.x}
+                y={obstacle.y}
+                rotation={obstacle.rotation}
+                dx={obstacle.dx}
+                dy={obstacle.dy}
+              />
+            ))}
+          </Canvas>
+          {gameState.gameOver && (
+            <EndgameNotification
+              success={missionSuccess}
+              onRestart={handleRestart}
+            />
+          )}
+        </ScreenHalf>
+        <VerticalLine />
+        <ScreenHalf>
+          <CommandCenter onLaunch={handleLaunch} isGameRunning={isRunning} />
+        </ScreenHalf>
+      </AppWrapper>
+    </GameStateContext.Provider>
   );
 };
 export default App;
