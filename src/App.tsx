@@ -20,13 +20,15 @@ import {
 } from './utils/constants';
 import { GameState, Direction } from './types';
 
-import planetXImg from './assets/images/planet.png'
-import earthImg from './assets/images/earth.png'
+import planetXImg from './assets/images/planet.png';
+import earthImg from './assets/images/earth.png';
+import commandCenterBackgroundImg from './assets/images/command-center-background.jpg';
 
 const VerticalLine = styled.div`
   width: 5px;
   height: 100vh;
   background: white;
+  z-index: 1;
 `;
 
 const AppWrapper = styled.div`
@@ -38,6 +40,15 @@ const ScreenHalf = styled.div`
   flex: 1;
   height: 100%;
   position: relative;
+`;
+
+const BackgroundImage = styled.div`
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background-image: url(${commandCenterBackgroundImg});
+  background-size: cover;
+  background-position: center;
 `;
 
 const App: React.FC = () => {
@@ -144,11 +155,20 @@ const App: React.FC = () => {
 
   return (
     <AppWrapper>
+            <BackgroundImage />
       <ScreenHalf>
         <Canvas width={CANVAS_WIDTH} height={CANVAS_HEIGHT}>
-          <Planet x={gameState.earth.x} y={gameState.earth.y} planetImg={earthImg} />
+          <Planet
+            x={gameState.earth.x}
+            y={gameState.earth.y}
+            planetImg={earthImg}
+          />
           <Rocket x={gameState.rocket.x} y={gameState.rocket.y} />
-          <Planet x={gameState.planetX.x} y={gameState.planetX.y} planetImg={planetXImg} />
+          <Planet
+            x={gameState.planetX.x}
+            y={gameState.planetX.y}
+            planetImg={planetXImg}
+          />
           {gameState.obstacles.map((obstacle, index) => (
             <Obstacle
               key={index}

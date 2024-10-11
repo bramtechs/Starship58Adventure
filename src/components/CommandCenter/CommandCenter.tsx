@@ -1,18 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
 
-import commandCenterBackgroundImg from '../../assets/images/command-center-background.jpg';
-
-const BackgroundImage = styled.div`
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  background-image: url(${commandCenterBackgroundImg});
-  background-size: cover;
-  background-position: center;
-  transform: scale(1.05);
-`;
-
 const Content = styled.div`
   position: relative;
   z-index: 1;
@@ -92,7 +80,6 @@ export const CommandCenter: React.FC<CommandCenterProps> = ({
 }) => {
   return (
     <CommandCenterWrapper>
-      <BackgroundImage />
       <Content>
         <FormArea>
           <Title>Command Center</Title>
