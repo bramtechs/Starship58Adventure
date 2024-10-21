@@ -6,9 +6,9 @@ import {
   Planet,
   Obstacle,
   EndgameNotification,
-} from './components/';
-import useGameLoop from './hooks/useGameLoop';
-import { checkCollision, randomBetween } from './utils/helpers';
+} from '@/components';
+import useGameLoop from '@/hooks/useGameLoop';
+import { checkCollision, randomBetween } from '@/utils/helpers';
 import {
   CANVAS_WIDTH,
   CANVAS_HEIGHT,
@@ -17,12 +17,12 @@ import {
   OXYGEN_DEPLETION_RATE,
   INITIAL_OXYGEN,
 } from './utils/constants';
-import { GameState, Direction } from './types';
-import { GameStateContext } from './contexts/GameStateContext';
+import { GameState, Direction } from '@/types';
+import { GameStateContext } from '@/contexts/GameStateContext';
 
-import planetXImg from './assets/images/planet.png';
-import earthImg from './assets/images/earth.png';
-import commandCenterBackgroundImg from './assets/images/command-center-background.jpg';
+import planetXImg from '@/assets/images/planet.png';
+import earthImg from '@/assets/images/earth.png';
+import commandCenterBackgroundImg from '@/assets/images/command-center-background.jpg';
 
 const App: React.FC = () => {
   const [isRunning, setIsRunning] = useState(false);

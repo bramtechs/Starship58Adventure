@@ -2,7 +2,7 @@ import React from 'react';
 import { Image } from 'react-konva';
 import useImage from 'use-image';
 
-import { Position } from '../../types';
+import { Position } from '@/types';
 
 interface PlanetProps extends Position {
   planetImg: string

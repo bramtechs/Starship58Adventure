@@ -1,5 +1,5 @@
 import React, { useContext, useState } from 'react';
-import { GameStateContext } from '../../contexts/GameStateContext';
+import { GameStateContext } from '@/contexts/GameStateContext';
 
 interface CommandCenterProps {
   onLaunch: () => void;

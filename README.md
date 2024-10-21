@@ -28,12 +28,12 @@ yarn install
 Start the development server to run the application locally:
 
 ```bash
-yarn start
+yarn dev
 ```
 
 ### 4. Open the App in Your Browser
 
-Open your browser and navigate to `http://localhost:3000` to see the app running.
+Open your browser and navigate to `http://localhost:5173` to see the app running.
 
 ## Project Structure
 

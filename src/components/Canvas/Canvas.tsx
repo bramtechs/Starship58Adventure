@@ -2,7 +2,7 @@ import React, { ReactNode } from 'react';
 import { Stage as KonvaStage, Layer, Image } from 'react-konva';
 import useImage from 'use-image';
 
-import spaceBackgroundImg from '../../assets/images/space-background.jpg';
+import spaceBackgroundImg from '@/assets/images/space-background.jpg';
 
 interface CanvasProps {
   width: number;

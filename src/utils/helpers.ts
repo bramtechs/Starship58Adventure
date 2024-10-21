@@ -1,4 +1,4 @@
-import { Position } from '../types';
+import { Position } from '@/types';
 
 export const randomBetween = (min: number, max: number): number => {
   return Math.random() * (max - min) + min;
