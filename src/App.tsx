@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback } from "react";
 import {
   Canvas,
   CommandCenter,
@@ -6,9 +6,9 @@ import {
   Planet,
   Obstacle,
   EndgameNotification,
-} from '@/components';
-import useGameLoop from '@/hooks/useGameLoop';
-import { checkCollision, randomBetween } from '@/utils/helpers';
+} from "@/components";
+import useGameLoop from "@/hooks/useGameLoop";
+import { checkCollision, randomBetween } from "@/utils/helpers";
 import {
   CANVAS_WIDTH,
   CANVAS_HEIGHT,
@@ -16,13 +16,12 @@ import {
   OBSTACLE_SPEED,
   OXYGEN_DEPLETION_RATE,
   INITIAL_OXYGEN,
-} from './utils/constants';
-import { GameState, Direction } from '@/types';
-import { GameStateContext } from '@/contexts/GameStateContext';
+} from "./utils/constants";
+import { GameState, Direction } from "@/types";
+import { GameStateContext } from "@/contexts/GameStateContext";
 
-import planetXImg from '@/assets/images/planet.png';
-import earthImg from '@/assets/images/earth.png';
-import commandCenterBackgroundImg from '@/assets/images/command-center-background.jpg';
+import planetXImg from "@/assets/images/planet.png";
+import earthImg from "@/assets/images/earth.png";
 
 const App: React.FC = () => {
   const [isRunning, setIsRunning] = useState(false);
@@ -90,11 +89,11 @@ const App: React.FC = () => {
       if (rocketOutOfBounds || collidesWithObstacle || newState.oxygen <= 0) {
         newState.gameOver = true;
         setMissionSuccess(false);
-        console.log('Game Over!');
+        console.log("Game Over!");
       } else if (reachesPlanet) {
         newState.gameOver = true;
         setMissionSuccess(true);
-        console.log('Mission Accomplished!');
+        console.log("Mission Accomplished!");
       }
 
       // Log relevant events
@@ -131,12 +130,8 @@ const App: React.FC = () => {
     <GameStateContext.Provider
       value={{ gameState, setDirection, rotation, setRotation }}
     >
-      <div className='flex h-screen'>
-        <div
-          className='absolute w-full h-full bg-cover bg-center'
-          style={{ backgroundImage: `url(${commandCenterBackgroundImg})` }}
-        ></div>
-        <div className='flex-1 h-full relative'>
+      <div className="flex h-screen">
+        <div className="flex-1 h-full relative">
           <Canvas width={CANVAS_WIDTH} height={CANVAS_HEIGHT}>
             <Planet
               x={gameState.earth.x}
@@ -171,8 +166,8 @@ const App: React.FC = () => {
             />
           )}
         </div>
-        <div className='w-[5px] h-screen bg-white z-10'></div>
-        <div className='flex-1 h-full relative'>
+        <div className="w-[5px] h-screen bg-white z-10"></div>
+        <div className="flex-1 h-full relative">
           <CommandCenter onLaunch={handleLaunch} isGameRunning={isRunning} />
         </div>
       </div>
