@@ -33,7 +33,7 @@ const App: React.FC = () => {
     rocket: { x: 23, y: CANVAS_HEIGHT - 160 },
     earth: { x: 0, y: CANVAS_HEIGHT - 100 },
     planetX: { x: CANVAS_WIDTH - 105, y: 5 },
-    obstacles: Array(5)
+    obstacles: Array(10)
       .fill(null)
       .map(() => ({
         x: randomBetween(100, CANVAS_WIDTH - 100),
@@ -114,9 +114,13 @@ const App: React.FC = () => {
     updateGameState
   );
 
+  // MISSION BRIEFING: Launch Sequence Implementation
+  // As a cadet, your mission is to:
+  // 1. Initialize the launch sequence using the startGame function
+  // 2. Update mission control status via setIsRunning
+  // 3. Remember: A successful launch is crucial for the mission!
   const handleLaunch = () => {
-    startGame();
-    setIsRunning(true);
+    // Your launch sequence code here, cadet!
   };
 
   const handleRestart = () => {
