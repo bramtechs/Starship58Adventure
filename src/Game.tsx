@@ -320,7 +320,7 @@ export const Game: React.FC = () => {
         });
         const skybox = new THREE.Mesh(skyboxGeometry, skyboxMaterial);
         scene.add(skybox);
-        
+
 
         function onCrash(healthLost: number, oxygenLost: number) {
             setHealth(health => health - healthLost);
@@ -368,7 +368,7 @@ export const Game: React.FC = () => {
             game.asteroids.push(asteroid);
             scene.add(asteroid.mesh);
         }
-        
+
 
         game.notPlayer = [game.earth, game.trappist, ...game.asteroids];
 
