@@ -1,18 +1,9 @@
 import { FC } from 'react';
-import { TopBar } from './components/UI/TopBar';
-import { BottomBar } from './components/UI/BottomBar';
-import { Content } from './components/UI/Content';
+import { TopBar, TopBarProps } from './components/UI/TopBar';
+import { Content, ContentProps } from './components/UI/Content';
+import { BottomBar, BottomBarProps } from './components/UI/BottomBar';
 
-interface UIProps {
-    distanceObj: number;
-    XCoordinateTrappist: number;
-}
-
-export const UI: FC<UIProps> = ({distanceObj, XCoordinateTrappist}) => {
-    const speedShip = 69;
-    const HullHealth = 60;
-    const Objectives = ["Navigate to Trappist-1", "Collect samples", "Return to Earth"];
-
+export const UI: FC<TopBarProps & ContentProps & BottomBarProps> = (props) => {
     return (
         <div style={
             {
@@ -24,9 +15,9 @@ export const UI: FC<UIProps> = ({distanceObj, XCoordinateTrappist}) => {
                 color: "orange"
             }
         }>
-            <TopBar speedShip={speedShip} />
-            <Content distance={distanceObj} XCoordTrappist={XCoordinateTrappist}/>
-            <BottomBar HullHealth={HullHealth} Objectives={Objectives}/>
+            <TopBar shipSpeed={props.shipSpeed} oxygenLevel={props.oxygenLevel} shipMaxSpeed={props.shipMaxSpeed} />
+            <Content distance={props.distance} XCoordTrappist={props.XCoordTrappist} />
+            <BottomBar HullHealth={props.HullHealth} Objectives={props.Objectives} />
         </div>
 
 

@@ -5,7 +5,7 @@ import marker from '../../assets/images/marker.png';
 // y -> vertical
 // z -> depth -> size
 
-interface ContentProps {
+export interface ContentProps {
     distance: number;
     XCoordTrappist: number;
 }

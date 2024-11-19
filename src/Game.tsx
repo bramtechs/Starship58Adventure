@@ -13,6 +13,7 @@ interface Game {
     asteroids: Asteroid[];
     earth: Planet | null,
     trappist: Planet | null,
+    notPlayer: Entity[];
 }
 
 interface Textures {
@@ -46,21 +47,65 @@ function debugCube() {
     return new THREE.Mesh(geometry, material);
 }
 
+function touchSphere(radius: number) {
+    const geometry = new THREE.SphereGeometry(radius, 32, 32);
+
+    // Create a transparent material
+    const material = new THREE.MeshBasicMaterial({
+        color: 0xff0000,
+        transparent: true,
+        opacity: 0.5
+    });
+
+    const m = new THREE.Mesh(geometry, material);
+    m.renderOrder = 1;
+    return m;
+}
+
+
 abstract class Entity {
     x: number;
     z: number;
     radius: number;
+    dangerSphere: THREE.Mesh<THREE.SphereGeometry, THREE.MeshBasicMaterial, THREE.Object3DEventMap>;
 
     constructor(x: number, y: number, radius: number = 5) {
         this.x = x;
         this.z = y;
         this.radius = radius;
+        this.dangerSphere = touchSphere(this.radius + this.dangerousDistance);
+        this.dangerSphere.visible = false;
+        game?.scene.add(this.dangerSphere);
+    }
+
+    get dangerousDistance() {
+        return this.radius * 0.1;
+    }
+
+    distanceTo(x: number, z: number): number {
+        return Math.sqrt(Math.pow(this.x - x, 2) + Math.pow(this.z - z, 2));
+    }
+
+    collidesWith(entity: Entity): boolean {
+        return this.distanceTo(entity.x, entity.z) < this.radius + entity.radius;
+    }
+
+    dangerouslyCloseTo(entity: Entity): boolean {
+        return this.distanceTo(entity.x, entity.z) < this.radius + entity.radius + 5;
+    }
+
+    hideDanger() {
+        this.dangerSphere.visible = false;
+    }
+
+    showDanger() {
+        this.dangerSphere.position.set(this.x, 0, this.z);
+        this.dangerSphere.visible = true;
     }
 
     abstract update(delta: number): void;
 
 }
-
 class Asteroid extends Entity {
     mesh: THREE.Mesh<THREE.PlaneGeometry, THREE.MeshBasicMaterial, THREE.Object3DEventMap>;
 
@@ -91,15 +136,24 @@ class Planet extends Entity {
     }
 }
 
+type CrashCb = (healthLost: number, oxygenLoss: number) => void;
+
 class Player extends Entity {
     camera: THREE.PerspectiveCamera;
 
     velocity: THREE.Vector2 = new THREE.Vector2(0, 0);
     angleDeg: number = 0;
 
-    constructor() {
-        super(-5, 0);
+    timeSinceLastCrash: number = 0;
 
+    camOffset: THREE.Vector3 = new THREE.Vector3(0, 0, 0);
+
+    shakeId: any = null;
+    onCrashed: CrashCb;
+
+    constructor(onCrashed: CrashCb) {
+        super(-25, 0);
+        this.onCrashed = onCrashed;
         this.camera = new THREE.PerspectiveCamera(
             75, // Field of view
             window.innerWidth / window.innerHeight, // Aspect ratio
@@ -113,7 +167,41 @@ class Player extends Entity {
         this.camera.updateProjectionMatrix();
     }
 
-    update(delta: any): void {
+    shake() {
+        let shakes = 0;
+        if (!this.shakeId) {
+            this.shakeId = setInterval(() => {
+                const shakeAmount = 0.01;
+                this.camOffset.set(
+                    randomBetween(-shakeAmount, shakeAmount),
+                    randomBetween(-shakeAmount, shakeAmount),
+                    randomBetween(-shakeAmount, shakeAmount)
+                )
+                if (shakes++ > 10) {
+                    clearInterval(this.shakeId);
+                    this.camera.position.set(this.x, 0, this.z);
+                    this.camOffset.set(0, 0, 0);
+                    this.shakeId = null;
+                }
+                console.log("shaking");
+            }, 50);
+        }
+    }
+
+    crash() {
+        if (this.timeSinceLastCrash > 2) {
+            console.warn("You crashed!");
+            const damage = randomBetween(20, 30);
+            const oxygenLoss = randomBetween(5, 15);
+            this.onCrashed(damage, oxygenLoss);
+            this.timeSinceLastCrash = 0;
+            this.shake();
+            this.velocity.set(0, 0);
+        }
+    }
+
+    update(delta: number): void {
+        this.timeSinceLastCrash += delta;
 
         const rotSpeed = 90;
         if (keysPressed['ArrowLeft']) {
@@ -146,8 +234,22 @@ class Player extends Entity {
         this.x += this.velocity.x * delta;
         this.z += this.velocity.y * delta;
 
-        this.camera.position.set(this.x, 0, this.z);
+        this.camera.position.set(this.x + this.camOffset.x, this.camOffset.y, this.z + + this.camOffset.z);
         this.camera.lookAt(this.x + Math.cos(this.angleDeg * DEG2RAD), 0, this.z + Math.sin(this.angleDeg * DEG2RAD));
+
+        game!.notPlayer.forEach(entity => {
+            if (this.collidesWith(entity)) {
+                this.crash();
+            }
+        });
+
+        game!.notPlayer.forEach(entity => {
+            if (this.dangerouslyCloseTo(entity)) {
+                entity.showDanger();
+            } else {
+                entity.hideDanger();
+            }
+        });
     }
 
 
@@ -158,6 +260,13 @@ export const Game: React.FC = () => {
     let [distance, setDistance] = useState<number>(0);
     let [xCoordScreen, setXCoordScreen] = useState<number>(0);
     let canvas = useRef(null);
+
+    const [health, setHealth] = useState<number>(100);
+    const [oxygen, setOxygen] = useState<number>(100);
+
+    const [speed, setSpeed] = useState<number>(0);
+
+    const shipMaxSpeed = 1000;
 
     useEffect(() => {
 
@@ -174,12 +283,18 @@ export const Game: React.FC = () => {
             planet_tex: texLoader.load('/images/planet.png')
         }
 
+        function onCrash(healthLost: number, oxygenLost: number) {
+            setHealth(health => health - healthLost);
+            setOxygen(oxygen => oxygen - oxygenLost);
+        }
+
         game = {
-            player: new Player(),
+            player: new Player(onCrash),
             scene: scene,
             asteroids: [],
             earth: null,
-            trappist: null
+            trappist: null,
+            notPlayer: []
         }
 
         game.earth = new Planet(0, 0, textures.earth_tex);
@@ -197,6 +312,8 @@ export const Game: React.FC = () => {
             game.asteroids.push(asteroid);
             scene.add(asteroid.mesh);
         }
+
+        game.notPlayer = [game.earth, game.trappist, ...game.asteroids];
 
         function distanceBetweenPlanet() {
             if (game?.trappist?.mesh.position) {
@@ -251,7 +368,7 @@ export const Game: React.FC = () => {
     return (
         <>
             <canvas ref={canvas} />
-            <UI distanceObj={distance} XCoordinateTrappist={xCoordScreen} />
+            <UI shipSpeed={speed} oxygenLevel={oxygen} shipMaxSpeed={shipMaxSpeed} distance={distance} HullHealth={health} Objectives={["Navigate to TRAPPIST-1.", "Do not destroy your ship!", "Do not run out of oxygen!"]} XCoordTrappist={xCoordScreen} />
         </>
     )
 }
