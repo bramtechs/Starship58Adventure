@@ -14,6 +14,8 @@ export const BottomBar: FC<BottomBarProps> = ({ HullHealth, Objectives }) => {
         setHealth(HullHealth);
     }, [HullHealth]);
 
+    const health = Math.ceil(Math.max(0, Math.min(100, HullHealth)));
+
     if (Health <= 0) {
         return <GameOver />;
     }
@@ -28,7 +30,7 @@ export const BottomBar: FC<BottomBarProps> = ({ HullHealth, Objectives }) => {
                 </ul>
             </div>
             <div className='HullHealth'>
-                <ProgressBar now={HullHealth} label={`${Math.ceil(HullHealth)}%`} style={{ width: 300, height: 50, backgroundColor: "orange" }} variant="danger" />
+                <ProgressBar now={health} label={`${health}%`} style={{ width: 300, height: 50, backgroundColor: "orange" }} variant="danger" />
             </div>
         </div>
     )

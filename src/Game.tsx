@@ -32,7 +32,7 @@ let textures: Textures | null = null;
 
 function createBillboard(texture: THREE.Texture, radius: number) {
     const material = new THREE.MeshBasicMaterial({ map: texture, color: 0xffffff });
-    const geometry = new THREE.PlaneGeometry(radius, radius);
+    const geometry = new THREE.PlaneGeometry(radius * 2, radius * 2);
     return new THREE.Mesh(geometry, material);
 }
 
@@ -48,7 +48,7 @@ function debugCube() {
 }
 
 function touchSphere(radius: number) {
-    const geometry = new THREE.SphereGeometry(radius, 32, 32);
+    const geometry = new THREE.SphereGeometry(radius / 1.8, 32, 32);
 
     // Create a transparent material
     const material = new THREE.MeshBasicMaterial({
@@ -73,25 +73,18 @@ abstract class Entity {
         this.x = x;
         this.z = y;
         this.radius = radius;
-        this.dangerSphere = touchSphere(this.radius + this.dangerousDistance);
+        this.dangerSphere = touchSphere(this.radius);
         this.dangerSphere.visible = false;
         game?.scene.add(this.dangerSphere);
     }
 
-    get dangerousDistance() {
-        return this.radius * 0.05;
-    }
 
     distanceTo(x: number, z: number): number {
         return Math.sqrt(Math.pow(this.x - x, 2) + Math.pow(this.z - z, 2));
     }
 
     collidesWith(entity: Entity): boolean {
-        return this.distanceTo(entity.x, entity.z) < this.radius + entity.radius;
-    }
-
-    dangerouslyCloseTo(entity: Entity): boolean {
-        return this.distanceTo(entity.x, entity.z) < this.radius + entity.radius + 5;
+        return this.distanceTo(entity.x, entity.z) < this.radius / 1.2;
     }
 
     hideDanger() {
@@ -110,7 +103,7 @@ class Asteroid extends Entity {
     mesh: THREE.Mesh<THREE.PlaneGeometry, THREE.MeshBasicMaterial, THREE.Object3DEventMap>;
 
     constructor(x: number, y: number) {
-        super(x, y, randomBetween(5, 10));
+        super(x, y, randomBetween(1, 10));
         this.mesh = createBillboard(textures!.asteroid_tex, this.radius);
     }
 
@@ -244,7 +237,7 @@ class Player extends Entity {
         });
 
         game!.notPlayer.forEach(entity => {
-            if (this.dangerouslyCloseTo(entity)) {
+            if (this.collidesWith(entity)) {
                 entity.showDanger();
             } else {
                 entity.hideDanger();
@@ -307,12 +300,20 @@ export const Game: React.FC = () => {
         renderer.setSize(window.innerWidth, window.innerHeight);
         document.body.appendChild(renderer.domElement);
 
-        // Generate asteroids
-        for (let i = 0; i < 10; i++) {
-            const asteroid = new Asteroid(randomBetween(-50, 50), randomBetween(-50, 50));
+        const maxRange = 250;
+
+        // Generate asteroids around center point between earth and trappist
+        const centerX = (game.earth.x + game.trappist.x) / 2;
+        const centerZ = (game.earth.z + game.trappist.z) / 2;
+
+        for (let i = 0; i < 80; i++) {
+            const x = centerX + randomBetween(-maxRange, maxRange);
+            const z = centerZ + randomBetween(-maxRange, maxRange);
+            const asteroid = new Asteroid(x, z);
             game.asteroids.push(asteroid);
             scene.add(asteroid.mesh);
         }
+
 
         game.notPlayer = [game.earth, game.trappist, ...game.asteroids];
 
