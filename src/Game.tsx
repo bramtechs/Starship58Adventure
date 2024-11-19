@@ -149,7 +149,8 @@ class Player extends Entity {
         this.camera.lookAt(this.x + Math.cos(this.angleDeg * DEG2RAD), 0, this.z + Math.sin(this.angleDeg * DEG2RAD));
     }
 
-
+ 
+    
 }
 
 export const Game: React.FC = () => {
