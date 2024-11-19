@@ -263,7 +263,7 @@ class Player extends Entity {
 }
 
 export const Game: React.FC = () => {
-    let [distance, setDistance] = useState<number>(0);
+    let [distance, setDistance] = useState<number>(999999);
     let [xCoordScreen, setXCoordScreen] = useState<number>(0);
     let [yCoordScreen, setYCoordScreen] = useState<number>(0);
     let canvas = useRef(null);
@@ -274,6 +274,14 @@ export const Game: React.FC = () => {
     const [speed, setSpeed] = useState<number>(0);
 
     const shipMaxSpeed = 1;
+
+    let shouldRun = true;
+
+    function win() {
+        console.log("You win!");
+        shouldRun = false;
+        game?.player.velocity.set(0, 0);
+    }
 
     useEffect(() => {
 
@@ -342,6 +350,7 @@ export const Game: React.FC = () => {
 
         // Animation loop
         function animate() {
+            if (!shouldRun) return;
             requestAnimationFrame(animate);
 
             const delta = 1 / 60;
@@ -400,7 +409,7 @@ export const Game: React.FC = () => {
     return (
         <>
             <canvas ref={canvas} />
-            <UI shipSpeed={speed} oxygenLevel={oxygen} shipMaxSpeed={shipMaxSpeed} distance={distance} HullHealth={health} Objectives={["Navigate to TRAPPIST-1.", "Do not destroy your ship!", "Do not run out of oxygen!"]} XCoordTrappist={xCoordScreen} YCoordTrappist={yCoordScreen} />
+            <UI shipSpeed={speed} oxygenLevel={oxygen} shipMaxSpeed={shipMaxSpeed} distance={distance} HullHealth={health} Objectives={["Navigate to TRAPPIST-1.", "Do not destroy your ship!", "Do not run out of oxygen!"]} XCoordTrappist={xCoordScreen} YCoordTrappist={yCoordScreen} onWin={win} />
         </>
     )
 }

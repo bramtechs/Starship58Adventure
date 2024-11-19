@@ -10,14 +10,12 @@ export interface ContentProps {
     distance: number;
     XCoordTrappist: number;
     YCoordTrappist: number;
+    onWin: () => void;
 }
 
-export const Content: FC<ContentProps> = ({ distance, XCoordTrappist, YCoordTrappist }) => {
-
-    useEffect(() => {
-    }, [distance]);
-
-    if(distance < 25){
+export const Content: FC<ContentProps> = ({ distance, XCoordTrappist, YCoordTrappist, onWin }) => {
+    if (distance < 25) {
+        onWin();
         return <WinScreen />;
     }
 
