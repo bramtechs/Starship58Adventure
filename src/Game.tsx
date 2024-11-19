@@ -4,6 +4,7 @@ import * as THREE from 'three';
 import { randomBetween } from "./utils/helpers";
 import { DEG2RAD } from "three/src/math/MathUtils.js";
 import { UI } from "./UI";
+import { set } from "react-hook-form";
 
 
 interface Game {
@@ -205,12 +206,12 @@ class Player extends Entity {
         const rotSpeed = 90;
         if (keysPressed['ArrowLeft']) {
             this.angleDeg -= rotSpeed * delta;
-            console.log(this.angleDeg);
+            //console.log(this.angleDeg);
         }
 
         if (keysPressed['ArrowRight']) {
             this.angleDeg += rotSpeed * delta;
-            console.log(this.angleDeg);
+            //console.log(this.angleDeg);
         }
 
         const baseThrust = 10;
@@ -257,6 +258,7 @@ class Player extends Entity {
 
 export const Game: React.FC = () => {
     let [distance, setDistance] = useState<number>(0);
+    let [xCoordScreen, setXCoordScreen] = useState<number>(0);
     let canvas = useRef(null);
 
     const [health, setHealth] = useState<number>(100);
@@ -298,6 +300,7 @@ export const Game: React.FC = () => {
         game.earth = new Planet(0, 0, textures.earth_tex);
         game.trappist = new Planet(randomBetween(-500, 500), randomBetween(-500, 500), textures.planet_tex);
 
+
         // Create a renderer
         const renderer = new THREE.WebGLRenderer({ canvas: canvas.current as any });
         renderer.setSize(window.innerWidth, window.innerHeight);
@@ -329,8 +332,17 @@ export const Game: React.FC = () => {
             game!.earth!.update(delta);
             game!.trappist!.update(delta);
 
+            //get distance between player and trappist
             const distance = distanceBetweenPlanet();
             setDistance(distance);
+
+            //get x coordinate of trappist on screen
+            const vector = new THREE.Vector3(game!.trappist!.mesh.position.x, 0, game!.trappist!.mesh.position.z);
+            vector.project(game!.player.camera);
+
+            const width = window.innerWidth;
+            const xCoord = Math.round((vector.x + 1) / 2 * width);
+            setXCoordScreen(xCoord);
 
             renderer.render(scene, game!.player.camera);
         }
@@ -356,7 +368,7 @@ export const Game: React.FC = () => {
     return (
         <>
             <canvas ref={canvas} />
-            <UI shipSpeed={speed} oxygenLevel={oxygen} shipMaxSpeed={shipMaxSpeed} distance={distance} HullHealth={health} Objectives={["Navigate to TRAPPIST-1.", "Do not destroy your ship!", "Do not run out of oxygen!"]} />
+            <UI shipSpeed={speed} oxygenLevel={oxygen} shipMaxSpeed={shipMaxSpeed} distance={distance} HullHealth={health} Objectives={["Navigate to TRAPPIST-1.", "Do not destroy your ship!", "Do not run out of oxygen!"]} XCoordTrappist={xCoordScreen} />
         </>
     )
 }

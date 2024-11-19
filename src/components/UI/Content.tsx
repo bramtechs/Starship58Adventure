@@ -7,18 +7,19 @@ import marker from '../../assets/images/marker.png';
 
 export interface ContentProps {
     distance: number;
+    XCoordTrappist: number;
 }
 
-export const Content: FC<ContentProps> = ({distance}) => {
-    const positionPlanet = {x: 0, y: 0};
-    let interval = 1000;
+export const Content: FC<ContentProps> = ({distance, XCoordTrappist}) => {
+    
     useEffect(() => {
-        console.log(distance)
+        
     }, [distance]);
     
     return (
-        <div>
+        <div style={{width:"5%", position:'absolute', left:XCoordTrappist}} >
             <img src={marker} width={100} ></img>
+            <div style={{textAlign:"center"}}>{Math.floor(distance)}U</div>
         </div>
     );
 }
