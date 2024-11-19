@@ -6,8 +6,7 @@ import { Game } from './Game';
 import { UI } from './UI';
 
 ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
-  <React.StrictMode>
+  <>
     <Game />
-    <UI />
-  </React.StrictMode>
+  </>
 );

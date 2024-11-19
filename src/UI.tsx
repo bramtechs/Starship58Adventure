@@ -1,11 +1,9 @@
 import { FC } from 'react';
-import { TopBar } from './components/UI/TopBar';
+import { TopBar, TopBarProps } from './components/UI/TopBar';
 import { BottomBar } from './components/UI/BottomBar';
 import { Content } from './components/UI/Content';
 
-export const UI: FC = () => {
-    const speedShip = 69;
-
+export const UI: FC<TopBarProps> = (props) => {
     return (
         <div style={
             {
@@ -17,7 +15,7 @@ export const UI: FC = () => {
                 color: "orange"
             }
         }>
-            <TopBar speedShip={speedShip} />
+            <TopBar shipSpeed={props.shipSpeed} oxygenLevel={props.oxygenLevel} shipMaxSpeed={props.shipMaxSpeed} />
             <Content />
             <BottomBar />
         </div>

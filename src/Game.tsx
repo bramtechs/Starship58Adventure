@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react"
+import { useEffect, useRef, useState } from "react"
 import * as THREE from 'three';
 
 import { randomBetween } from "./utils/helpers";
@@ -130,15 +130,24 @@ class Planet extends Entity {
     }
 }
 
+type CrashCb = (healthLost: number, oxygenLoss: number) => void;
+
 class Player extends Entity {
     camera: THREE.PerspectiveCamera;
 
     velocity: THREE.Vector2 = new THREE.Vector2(0, 0);
     angleDeg: number = 0;
 
-    constructor() {
-        super(-25, 0);
+    timeSinceLastCrash: number = 0;
 
+    camOffset: THREE.Vector3 = new THREE.Vector3(0, 0, 0);
+
+    shakeId: any = null;
+    onCrashed: CrashCb;
+
+    constructor(onCrashed: CrashCb) {
+        super(-25, 0);
+        this.onCrashed = onCrashed;
         this.camera = new THREE.PerspectiveCamera(
             75, // Field of view
             window.innerWidth / window.innerHeight, // Aspect ratio
@@ -152,7 +161,41 @@ class Player extends Entity {
         this.camera.updateProjectionMatrix();
     }
 
-    update(delta: any): void {
+    shake() {
+        let shakes = 0;
+        if (!this.shakeId) {
+            this.shakeId = setInterval(() => {
+                const shakeAmount = 0.01;
+                this.camOffset.set(
+                    randomBetween(-shakeAmount, shakeAmount),
+                    randomBetween(-shakeAmount, shakeAmount),
+                    randomBetween(-shakeAmount, shakeAmount)
+                )
+                if (shakes++ > 10) {
+                    clearInterval(this.shakeId);
+                    this.camera.position.set(this.x, 0, this.z);
+                    this.camOffset.set(0, 0, 0);
+                    this.shakeId = null;
+                }
+                console.log("shaking");
+            }, 50);
+        }
+    }
+
+    crash() {
+        if (this.timeSinceLastCrash > 2) {
+            console.warn("You crashed!");
+            const damage = randomBetween(20, 30);
+            const oxygenLoss = randomBetween(5, 15);
+            this.onCrashed(damage, oxygenLoss);
+            this.timeSinceLastCrash = 0;
+            this.shake();
+            this.velocity.set(0, 0);
+        }
+    }
+
+    update(delta: number): void {
+        this.timeSinceLastCrash += delta;
 
         const rotSpeed = 90;
         if (keysPressed['ArrowLeft']) {
@@ -185,12 +228,12 @@ class Player extends Entity {
         this.x += this.velocity.x * delta;
         this.z += this.velocity.y * delta;
 
-        this.camera.position.set(this.x, 0, this.z);
+        this.camera.position.set(this.x + this.camOffset.x, this.camOffset.y, this.z + + this.camOffset.z);
         this.camera.lookAt(this.x + Math.cos(this.angleDeg * DEG2RAD), 0, this.z + Math.sin(this.angleDeg * DEG2RAD));
 
         game!.notPlayer.forEach(entity => {
             if (this.collidesWith(entity)) {
-                console.warn("You crashed!");
+                this.crash();
             }
         });
 
@@ -208,6 +251,13 @@ export const Game: React.FC = () => {
 
     let canvas = useRef(null);
 
+    const [health, setHealth] = useState<number>(100);
+    const [oxygen, setOxygen] = useState<number>(100);
+
+    const [speed, setSpeed] = useState<number>(0);
+
+    const shipMaxSpeed = 1000;
+
     useEffect(() => {
 
         if (game) return;
@@ -223,8 +273,13 @@ export const Game: React.FC = () => {
             planet_tex: texLoader.load('/images/planet.png')
         }
 
+        function onCrash(healthLost: number, oxygenLost: number) {
+            setHealth(health => health - healthLost);
+            setOxygen(oxygen => oxygen - oxygenLost);
+        }
+
         game = {
-            player: new Player(),
+            player: new Player(onCrash),
             scene: scene,
             asteroids: [],
             earth: null,
@@ -283,7 +338,7 @@ export const Game: React.FC = () => {
     return (
         <>
             <canvas ref={canvas} />
-            <UI />
+            <UI shipSpeed={speed} oxygenLevel={oxygen} shipMaxSpeed={shipMaxSpeed} />
         </>
     )
 }
