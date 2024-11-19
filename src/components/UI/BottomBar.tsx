@@ -1,6 +1,7 @@
-import { FC } from "react";
+import { FC, useState, useEffect } from "react";
 import 'bootstrap/dist/css/bootstrap.min.css';
 import ProgressBar from 'react-bootstrap/ProgressBar';
+import { GameOver } from "./GameOver";
 
 export interface BottomBarProps {
     HullHealth: number;
@@ -8,7 +9,14 @@ export interface BottomBarProps {
 }
 
 export const BottomBar: FC<BottomBarProps> = ({ HullHealth, Objectives }) => {
+    let [Health, setHealth] = useState<number>(0);
+    useEffect(() => {
+        setHealth(HullHealth);
+    }, [HullHealth]);
 
+    if (Health <= 0) {
+        return <GameOver />;
+    }
     return (
         <div className="bottombar" style={{ display: "flex", justifyContent: "space-around", height: "20%", "width": "100vw", position: "absolute", bottom: 0 }}>
             <div className='Objective'>
