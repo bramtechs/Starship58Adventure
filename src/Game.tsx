@@ -53,7 +53,7 @@ class Player extends Entity {
     angleDeg: number = 0;
 
     constructor() {
-        super(0, 0);
+        super(-5, 0);
 
         this.camera = new THREE.PerspectiveCamera(
             75, // Field of view
@@ -69,21 +69,31 @@ class Player extends Entity {
     }
 
     update(delta: any): void {
+
+        const rotSpeed = 90;
         if (keysPressed['ArrowLeft']) {
-            this.angleDeg -= 10 * delta;
+            this.angleDeg -= rotSpeed * delta;
             console.log(this.angleDeg);
         }
 
         if (keysPressed['ArrowRight']) {
-            this.angleDeg += 10 * delta;
+            this.angleDeg += rotSpeed * delta;
             console.log(this.angleDeg);
         }
 
-        if (keysPressed['ArrowUp']) {
-            const baseThrust = 10;
-            this.velocity.x += Math.cos(this.angleDeg * DEG2RAD) * baseThrust;
-            this.velocity.y += Math.sin(this.angleDeg * DEG2RAD) * baseThrust;
+        const baseThrust = 10;
+        const thrust = (a: number) => {
+            this.velocity.x += Math.cos(this.angleDeg * DEG2RAD) * a * delta;
+            this.velocity.y += Math.sin(this.angleDeg * DEG2RAD) * a * delta;
+        }
 
+        if (keysPressed['ArrowUp']) {
+            thrust(baseThrust);
+            console.log(this.velocity);
+        }
+
+        if (keysPressed['ArrowDown']) {
+            thrust(-baseThrust);
             console.log(this.velocity);
         }
 
@@ -92,6 +102,7 @@ class Player extends Entity {
         this.z += this.velocity.y * delta;
 
         this.camera.position.set(this.x, 0, this.z);
+        this.camera.lookAt(this.x + Math.cos(this.angleDeg * DEG2RAD), 0, this.z + Math.sin(this.angleDeg * DEG2RAD));
     }
 
 
@@ -103,20 +114,18 @@ export const Game: React.FC = () => {
 
     useEffect(() => {
 
+        if (game) return;
+
         // Create a scene
         const scene = new THREE.Scene();
 
-        // Create a camera
-        const camera = new THREE.PerspectiveCamera(
-            75, // Field of view
-            window.innerWidth / window.innerHeight, // Aspect ratio
-            0.1, // Near clipping plane
-            1000 // Far clipping plane
-        );
-        camera.position.z = 5;
+        game = {
+            player: new Player(),
+            scene: scene
+        }
 
         // Create a renderer
-        const renderer = new THREE.WebGLRenderer();
+        const renderer = new THREE.WebGLRenderer({ canvas: canvas.current as any });
         renderer.setSize(window.innerWidth, window.innerHeight);
         document.body.appendChild(renderer.domElement);
 
@@ -130,19 +139,25 @@ export const Game: React.FC = () => {
         function animate() {
             requestAnimationFrame(animate);
 
-            // Rotate the cube
-            cube.rotation.x += 0.01;
-            cube.rotation.y += 0.01;
+            const delta = 1 / 60;
+            game?.player.update(delta);
 
-            renderer.render(scene, camera);
+            renderer.render(scene, game!.player.camera);
         }
         animate();
 
         // Handle window resize
         window.addEventListener('resize', () => {
-            camera.aspect = window.innerWidth / window.innerHeight;
-            camera.updateProjectionMatrix();
+            game?.player.resizeCam(window.innerWidth, window.innerHeight);
             renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+
+        window.addEventListener('keydown', (event) => {
+            keysPressed[event.key] = true;
+        });
+
+        window.addEventListener('keyup', (event) => {
+            keysPressed[event.key] = false;
         });
 
     })
