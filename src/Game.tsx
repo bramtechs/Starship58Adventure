@@ -9,15 +9,19 @@ interface Game {
     player: Player;
     scene: THREE.Scene;
     asteroids: Asteroid[];
-    textures: {
-        asteroid_tex: THREE.Texture;
-        earth_tex: THREE.Texture;
-        planet_tex: THREE.Texture;
-    }
+    earth: Planet | null,
+    trappist: Planet | null,
+}
+
+interface Textures {
+    asteroid_tex: THREE.Texture;
+    earth_tex: THREE.Texture;
+    planet_tex: THREE.Texture;
 }
 
 const keysPressed: { [key: string]: boolean } = {};
 let game: Game | null = null;
+let textures: Textures | null = null;
 
 function createBillboard(texture: THREE.Texture) {
     const material = new THREE.MeshBasicMaterial({ map: texture, color: 0xffffff });
@@ -28,6 +32,12 @@ function createBillboard(texture: THREE.Texture) {
 function billboardLookAt(mesh: THREE.Mesh, camera: THREE.Camera) {
     const { x, y, z } = camera.position;
     mesh.lookAt(x, y, z);
+}
+
+function debugCube() {
+    const geometry = new THREE.BoxGeometry();
+    const material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
+    return new THREE.Mesh(geometry, material);
 }
 
 abstract class Entity {
@@ -50,12 +60,28 @@ class Asteroid extends Entity {
 
     constructor(x: number, y: number) {
         super(x, y, randomBetween(5, 10));
-        this.mesh = createBillboard(game!.textures.asteroid_tex);
+        this.mesh = createBillboard(textures!.asteroid_tex);
     }
 
     update(delta: number): void {
         this.mesh.position.set(this.x, 0, this.z);
         billboardLookAt(this.mesh, game!.player.camera);
+    }
+}
+
+class Planet extends Entity {
+    mesh: THREE.Mesh<THREE.PlaneGeometry, THREE.MeshBasicMaterial, THREE.Object3DEventMap>;
+
+    constructor(x: number, y: number, texture: THREE.Texture) {
+        super(x, y, 10);
+        this.mesh = createBillboard(texture);
+        game!.scene.add(this.mesh);
+        console.log("planet")
+    }
+
+    update(delta: number): void {
+        billboardLookAt(this.mesh, game!.player.camera);
+        this.mesh.position.set(this.x, 0, this.z);
     }
 }
 
@@ -133,25 +159,28 @@ export const Game: React.FC = () => {
         const scene = new THREE.Scene();
 
         const texLoader = new THREE.TextureLoader();
+
+        textures = {
+            asteroid_tex: texLoader.load("/images/asteroid_1.png"),
+            earth_tex: texLoader.load('/images/earth.png'),
+            planet_tex: texLoader.load('/images/planet.png')
+        }
+
         game = {
             player: new Player(),
             scene: scene,
             asteroids: [],
-            textures: {
-                asteroid_tex: texLoader.load("/images/asteroid_1.png"),
-                earth_tex: texLoader.load('/images/earth.png'),
-                planet_tex: texLoader.load('/images/planet.png')
-            }
+            earth: null,
+            trappist: null
         }
+
+        game.earth = new Planet(0, 0, textures.earth_tex);
+        game.trappist = new Planet(randomBetween(-500, 500), randomBetween(-500, 500), textures.planet_tex);
 
         // Create a renderer
         const renderer = new THREE.WebGLRenderer({ canvas: canvas.current as any });
         renderer.setSize(window.innerWidth, window.innerHeight);
         document.body.appendChild(renderer.domElement);
-
-        // Add earth
-        const earth = createBillboard(game.textures.earth_tex);
-        scene.add(earth);
 
         // Generate asteroids
         for (let i = 0; i < 10; i++) {
@@ -167,8 +196,8 @@ export const Game: React.FC = () => {
             const delta = 1 / 60;
             game!.player.update(delta);
             game!.asteroids.forEach(asteroid => asteroid.update(delta));
-
-            billboardLookAt(earth, game!.player.camera);
+            game!.earth!.update(delta);
+            game!.trappist!.update(delta);
 
             renderer.render(scene, game!.player.camera);
         }
