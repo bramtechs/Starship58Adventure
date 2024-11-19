@@ -259,6 +259,7 @@ class Player extends Entity {
 export const Game: React.FC = () => {
     let [distance, setDistance] = useState<number>(0);
     let [xCoordScreen, setXCoordScreen] = useState<number>(0);
+    let [yCoordScreen, setYCoordScreen] = useState<number>(0);
     let canvas = useRef(null);
 
     const [health, setHealth] = useState<number>(100);
@@ -343,6 +344,7 @@ export const Game: React.FC = () => {
             const width = window.innerWidth;
             const xCoord = Math.round((vector.x + 1) / 2 * width);
             setXCoordScreen(xCoord);
+            setYCoordScreen(Math.round((-vector.y + 1) / 2 * window.innerHeight));
 
             renderer.render(scene, game!.player.camera);
         }
@@ -368,7 +370,7 @@ export const Game: React.FC = () => {
     return (
         <>
             <canvas ref={canvas} />
-            <UI shipSpeed={speed} oxygenLevel={oxygen} shipMaxSpeed={shipMaxSpeed} distance={distance} HullHealth={health} Objectives={["Navigate to TRAPPIST-1.", "Do not destroy your ship!", "Do not run out of oxygen!"]} XCoordTrappist={xCoordScreen} />
+            <UI shipSpeed={speed} oxygenLevel={oxygen} shipMaxSpeed={shipMaxSpeed} distance={distance} HullHealth={health} Objectives={["Navigate to TRAPPIST-1.", "Do not destroy your ship!", "Do not run out of oxygen!"]} XCoordTrappist={xCoordScreen} YCoordTrappist={yCoordScreen} />
         </>
     )
 }
