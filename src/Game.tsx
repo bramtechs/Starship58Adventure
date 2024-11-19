@@ -50,15 +50,11 @@ class Asteroid extends Entity {
 
     constructor(x: number, y: number) {
         super(x, y, randomBetween(5, 10));
-        const geometry = new THREE.BoxGeometry();
-        const material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
-        const cube = new THREE.Mesh(geometry, material);
-        game!.scene.add(cube);
-
         this.mesh = createBillboard(game!.textures.asteroid_tex);
     }
 
     update(delta: number): void {
+        this.mesh.position.set(this.x, 0, this.z);
         billboardLookAt(this.mesh, game!.player.camera);
     }
 }
@@ -157,6 +153,13 @@ export const Game: React.FC = () => {
         const earth = createBillboard(game.textures.earth_tex);
         scene.add(earth);
 
+        // Generate asteroids
+        for (let i = 0; i < 10; i++) {
+            const asteroid = new Asteroid(randomBetween(-50, 50), randomBetween(-50, 50));
+            game.asteroids.push(asteroid);
+            scene.add(asteroid.mesh);
+        }
+
         // Animation loop
         function animate() {
             requestAnimationFrame(animate);
@@ -167,7 +170,6 @@ export const Game: React.FC = () => {
 
             billboardLookAt(earth, game!.player.camera);
 
-            renderer.setClearColor(0x111111);
             renderer.render(scene, game!.player.camera);
         }
         animate();
