@@ -30,9 +30,9 @@ const keysPressed: { [key: string]: boolean } = {};
 let game: Game | null = null;
 let textures: Textures | null = null;
 
-function createBillboard(texture: THREE.Texture) {
+function createBillboard(texture: THREE.Texture, radius: number) {
     const material = new THREE.MeshBasicMaterial({ map: texture, color: 0xffffff });
-    const geometry = new THREE.PlaneGeometry(2, 2);
+    const geometry = new THREE.PlaneGeometry(radius, radius);
     return new THREE.Mesh(geometry, material);
 }
 
@@ -111,7 +111,7 @@ class Asteroid extends Entity {
 
     constructor(x: number, y: number) {
         super(x, y, randomBetween(5, 10));
-        this.mesh = createBillboard(textures!.asteroid_tex);
+        this.mesh = createBillboard(textures!.asteroid_tex, this.radius);
     }
 
     update(delta: number): void {
@@ -125,7 +125,7 @@ class Planet extends Entity {
 
     constructor(x: number, y: number, texture: THREE.Texture) {
         super(x, y, 10);
-        this.mesh = createBillboard(texture);
+        this.mesh = createBillboard(texture, this.radius);
         game!.scene.add(this.mesh);
         console.log("planet")
     }
