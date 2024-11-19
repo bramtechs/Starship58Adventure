@@ -213,14 +213,22 @@ class Player extends Entity {
             this.velocity.y += Math.sin(this.angleDeg * DEG2RAD) * a * delta;
         }
 
+        let thrusting = false;
         if (keysPressed['ArrowUp']) {
             thrust(baseThrust);
             //console.log(this.velocity);
+            thrusting = true;
         }
 
         if (keysPressed['ArrowDown']) {
             thrust(-baseThrust);
             //console.log(this.velocity);
+            thrusting = true;
+        }
+
+        if (!thrusting) {
+            // dampen velocity
+            this.velocity.multiplyScalar(0.99);
         }
 
         // apply velocity
@@ -260,7 +268,7 @@ export const Game: React.FC = () => {
 
     const [speed, setSpeed] = useState<number>(0);
 
-    const shipMaxSpeed = 1000;
+    const shipMaxSpeed = 1;
 
     useEffect(() => {
 
@@ -324,6 +332,8 @@ export const Game: React.FC = () => {
             return 0;
         }
 
+        let speedUpdateTimer = 0;
+
         // Animation loop
         function animate() {
             requestAnimationFrame(animate);
@@ -348,6 +358,13 @@ export const Game: React.FC = () => {
             setYCoordScreen(Math.round((-vector.y + 1) / 2 * window.innerHeight));
 
             renderer.render(scene, game!.player.camera);
+
+            speedUpdateTimer += delta;
+
+            if (speedUpdateTimer > 0.2) {
+                speedUpdateTimer = 0;
+                setSpeed(game!.player.velocity.length());
+            }
         }
         animate();
 
