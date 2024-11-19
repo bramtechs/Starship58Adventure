@@ -5,6 +5,8 @@ import { randomBetween } from "./utils/helpers";
 import { DEG2RAD } from "three/src/math/MathUtils.js";
 import { UI } from "./UI";
 
+const PREFIX = "/Starship58Adventure/";
+
 interface Game {
     player: Player;
     scene: THREE.Scene;
@@ -297,14 +299,14 @@ export const Game: React.FC = () => {
         const texLoader = new THREE.TextureLoader();
 
         textures = {
-            asteroid_tex: texLoader.load("/images/asteroid_1.png"),
-            earth_tex: texLoader.load('/images/earth.png'),
-            planet_tex: texLoader.load('/images/planet.png')
+            asteroid_tex: texLoader.load(PREFIX + "images/asteroid_1.png"),
+            earth_tex: texLoader.load(PREFIX + 'images/earth.png'),
+            planet_tex: texLoader.load(PREFIX + 'images/planet.png')
         }
 
 
         // Load skybox texture
-        const skyboxTexture = texLoader.load('/images/space-background.jpg');
+        const skyboxTexture = texLoader.load(PREFIX + 'images/space-background.jpg');
         const skyboxGeometry = new THREE.SphereGeometry(1000, 128, 128);
         const skyboxMaterial = new THREE.MeshBasicMaterial({
             map: skyboxTexture,
