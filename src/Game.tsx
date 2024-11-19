@@ -4,6 +4,7 @@ import * as THREE from 'three';
 import Asteroid1 from './assets/images/asteroid_1.webp';
 import { randomBetween } from "./utils/helpers";
 import { DEG2RAD, RAD2DEG } from "three/src/math/MathUtils.js";
+import { UI } from "./UI";
 
 interface Game {
     player: Player;
@@ -162,5 +163,10 @@ export const Game: React.FC = () => {
 
     })
 
-    return (<canvas ref={canvas} />)
+    return (
+        <>
+            <canvas ref={canvas} />
+            <UI />
+        </>
+    )
 }
