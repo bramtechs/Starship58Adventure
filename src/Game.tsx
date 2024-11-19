@@ -79,7 +79,7 @@ abstract class Entity {
     }
 
     get dangerousDistance() {
-        return this.radius * 0.1;
+        return this.radius * 0.05;
     }
 
     distanceTo(x: number, z: number): number {
