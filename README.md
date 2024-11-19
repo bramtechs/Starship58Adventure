@@ -1,9 +1,35 @@
+# Starship 58 Adventure
+
+<a href="https://bramtechs.github.io/Starship58Adventure/" target="_blank">Play
+in your browser!</a>
+
 Original code for a game programmed in 5 hours for
 [Hack The Future 2024](https://www.hackthefuture.be/), a Belgian Hackathon.
 
-Developed in a team of two, made in ThreeJS and React.
+Developed in a team of two, made in ThreeJS, Boostrap and React.
+
+## Scenario
+
+translated from Dutch
+
+Major Tom and his team are running out of oxygen and need your help to find the
+fastest way to 2MASS J23062928-0502285, also known as TRAPPIST-1. You are the
+head of the ground control center on Earth and are in charge of using all the
+data you receive from the spacecraft. Use this data as best you can to get
+everyone safely to their destination before they run out of oxygen. Are you
+ready to lead this life-saving mission?
+
+## Screenshots
+
+<img src="./misc/screenshot02.webp" max-height="350px" width="auto">
+<img src="./misc/screenshot01.webp" max-height="350px" width="auto">
+<img src="./misc/screenshot03.webp" max-height="350px" width="auto">
+<img src="./misc/screenshot04.webp" max-height="350px" width="auto">
 
 ---
+
+<details>
+<summary>Original readme</summary>
 
 # Starship 58 Adventure React TypeScript App
 
@@ -139,3 +165,5 @@ will control the rocket's navigation.
 
 Your journey through the stars awaits. Use your skills to navigate the vastness
 of space, overcome obstacles, and achieve your mission. May the stars guide you!
+
+</details>
