@@ -11,6 +11,7 @@ interface Game {
     asteroids: Asteroid[];
     earth: Planet | null,
     trappist: Planet | null,
+    notPlayer: Entity[],
 }
 
 interface Textures {
@@ -23,9 +24,9 @@ const keysPressed: { [key: string]: boolean } = {};
 let game: Game | null = null;
 let textures: Textures | null = null;
 
-function createBillboard(texture: THREE.Texture) {
+function createBillboard(texture: THREE.Texture, size: number) {
     const material = new THREE.MeshBasicMaterial({ map: texture, color: 0xffffff });
-    const geometry = new THREE.PlaneGeometry(2, 2);
+    const geometry = new THREE.PlaneGeometry(size, size);
     return new THREE.Mesh(geometry, material);
 }
 
@@ -40,15 +41,57 @@ function debugCube() {
     return new THREE.Mesh(geometry, material);
 }
 
+function touchSphere(radius: number) {
+    const geometry = new THREE.SphereGeometry(radius, 32, 32);
+
+    // Create a transparent material
+    const material = new THREE.MeshBasicMaterial({
+        color: 0xff0000,
+        transparent: true,
+        opacity: 0.5
+    });
+
+    return new THREE.Mesh(geometry, material);
+}
+
 abstract class Entity {
     x: number;
     z: number;
     radius: number;
+    dangerSphere: THREE.Mesh<THREE.SphereGeometry, THREE.MeshBasicMaterial, THREE.Object3DEventMap>;
 
     constructor(x: number, y: number, radius: number = 5) {
         this.x = x;
         this.z = y;
         this.radius = radius;
+        this.dangerSphere = touchSphere(this.radius + this.dangerousDistance);
+        this.dangerSphere.visible = false;
+        game?.scene.add(this.dangerSphere);
+    }
+
+    get dangerousDistance() {
+        return this.radius * 0.1;
+    }
+
+    distanceTo(x: number, z: number): number {
+        return Math.sqrt(Math.pow(this.x - x, 2) + Math.pow(this.z - z, 2));
+    }
+
+    collidesWith(entity: Entity): boolean {
+        return this.distanceTo(entity.x, entity.z) < this.radius + entity.radius;
+    }
+
+    dangerouslyCloseTo(entity: Entity): boolean {
+        return this.distanceTo(entity.x, entity.z) < this.radius + entity.radius + 5;
+    }
+
+    hideDanger() {
+        this.dangerSphere.visible = false;
+    }
+
+    showDanger() {
+        this.dangerSphere.position.set(this.x, 0, this.z);
+        this.dangerSphere.visible = true;
     }
 
     abstract update(delta: number): void;
@@ -60,7 +103,7 @@ class Asteroid extends Entity {
 
     constructor(x: number, y: number) {
         super(x, y, randomBetween(5, 10));
-        this.mesh = createBillboard(textures!.asteroid_tex);
+        this.mesh = createBillboard(textures!.asteroid_tex, this.radius);
     }
 
     update(delta: number): void {
@@ -73,8 +116,8 @@ class Planet extends Entity {
     mesh: THREE.Mesh<THREE.PlaneGeometry, THREE.MeshBasicMaterial, THREE.Object3DEventMap>;
 
     constructor(x: number, y: number, texture: THREE.Texture) {
-        super(x, y, 10);
-        this.mesh = createBillboard(texture);
+        super(x, y, 30);
+        this.mesh = createBillboard(texture, this.radius);
         game!.scene.add(this.mesh);
         console.log("planet")
     }
@@ -92,7 +135,7 @@ class Player extends Entity {
     angleDeg: number = 0;
 
     constructor() {
-        super(-5, 0);
+        super(-25, 0);
 
         this.camera = new THREE.PerspectiveCamera(
             75, // Field of view
@@ -142,9 +185,21 @@ class Player extends Entity {
 
         this.camera.position.set(this.x, 0, this.z);
         this.camera.lookAt(this.x + Math.cos(this.angleDeg * DEG2RAD), 0, this.z + Math.sin(this.angleDeg * DEG2RAD));
+
+        game!.notPlayer.forEach(entity => {
+            if (this.collidesWith(entity)) {
+                console.warn("You crashed!");
+            }
+        });
+
+        game!.notPlayer.forEach(entity => {
+            if (this.dangerouslyCloseTo(entity)) {
+                entity.showDanger();
+            } else {
+                entity.hideDanger();
+            }
+        });
     }
-
-
 }
 
 export const Game: React.FC = () => {
@@ -171,11 +226,13 @@ export const Game: React.FC = () => {
             scene: scene,
             asteroids: [],
             earth: null,
-            trappist: null
+            trappist: null,
+            notPlayer: []
         }
 
         game.earth = new Planet(0, 0, textures.earth_tex);
         game.trappist = new Planet(randomBetween(-500, 500), randomBetween(-500, 500), textures.planet_tex);
+
 
         // Create a renderer
         const renderer = new THREE.WebGLRenderer({ canvas: canvas.current as any });
@@ -188,6 +245,8 @@ export const Game: React.FC = () => {
             game.asteroids.push(asteroid);
             scene.add(asteroid.mesh);
         }
+
+        game.notPlayer = [game.earth, game.trappist, ...game.asteroids];
 
         // Animation loop
         function animate() {
