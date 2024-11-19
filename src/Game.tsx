@@ -31,11 +31,11 @@ let game: Game | null = null;
 let textures: Textures | null = null;
 
 function createBillboard(texture: THREE.Texture, radius: number) {
-    const material = new THREE.MeshBasicMaterial({ 
-        map: texture, 
-        color: 0xffffff, 
-        alphaTest: 0.5, 
-        transparent: true 
+    const material = new THREE.MeshBasicMaterial({
+        map: texture,
+        color: 0xffffff,
+        alphaTest: 0.5,
+        transparent: true
     });
     const geometry = new THREE.PlaneGeometry(radius * 2, radius * 2);
     return new THREE.Mesh(geometry, material);
@@ -338,6 +338,7 @@ export const Game: React.FC = () => {
         }
 
         let speedUpdateTimer = 0;
+        let oxygenLoseTimer = 0;
 
         // Animation loop
         function animate() {
@@ -370,6 +371,12 @@ export const Game: React.FC = () => {
                 speedUpdateTimer = 0;
                 setSpeed(game!.player.velocity.length());
             }
+
+            if (oxygenLoseTimer > 1) {
+                oxygenLoseTimer = 0;
+                setOxygen(oxygen => oxygen - 1);
+            }
+            oxygenLoseTimer += delta;
         }
         animate();
 
