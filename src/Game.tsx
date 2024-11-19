@@ -25,7 +25,7 @@ let game: Game | null = null;
 let textures: Textures | null = null;
 
 function createBillboard(texture: THREE.Texture, size: number) {
-    const material = new THREE.MeshBasicMaterial({ map: texture, color: 0xffffff });
+    const material = new THREE.MeshBasicMaterial({ map: texture, color: 0xffffff, transparent: true });
     const geometry = new THREE.PlaneGeometry(size, size);
     return new THREE.Mesh(geometry, material);
 }
@@ -51,7 +51,9 @@ function touchSphere(radius: number) {
         opacity: 0.5
     });
 
-    return new THREE.Mesh(geometry, material);
+    const m = new THREE.Mesh(geometry, material);
+    m.renderOrder = 1;
+    return m;
 }
 
 abstract class Entity {
