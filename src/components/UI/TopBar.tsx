@@ -28,13 +28,13 @@ export const TopBar: FC<TopBarProps> = ({ speedShip }) => {
         <div className="topbar" style={{ display: "flex", justifyContent: "space-around", height: "20%" }}>
             <div className='speedMeter' style={{ width: "10rem" }}>
                 <button onClick={() => setSpeed(speed + 1000)}>Increase Speed</button>
-                <CircularProgressbar value={percentage} text={`${percentage}u/s`} />;
+                <CircularProgressbar value={percentage} text={`${percentage}u/s`} />
             </div>
             <div className='compass'>
 
             </div>
             <div className='oxygenLevel' style={{ width: "10rem" }}>
-                <CircularProgressbar value={oxygenLevel} text={`${oxygenLevel}%`} />;
+                <CircularProgressbar value={oxygenLevel} text={`${oxygenLevel}%`} />
             </div>
         </div>
     )

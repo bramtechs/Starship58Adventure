@@ -1,22 +1,34 @@
 import { useEffect, useRef } from "react"
 import * as THREE from 'three';
 
-import Asteroid1 from './assets/images/asteroid_1.webp';
 import { randomBetween } from "./utils/helpers";
-import { DEG2RAD, RAD2DEG } from "three/src/math/MathUtils.js";
+import { DEG2RAD } from "three/src/math/MathUtils.js";
 import { UI } from "./UI";
 
 interface Game {
     player: Player;
     scene: THREE.Scene;
-}
-
-function getRandomAsteroid() {
-    return Asteroid1;
+    asteroids: Asteroid[];
+    textures: {
+        asteroid_tex: THREE.Texture;
+        earth_tex: THREE.Texture;
+        planet_tex: THREE.Texture;
+    }
 }
 
 const keysPressed: { [key: string]: boolean } = {};
 let game: Game | null = null;
+
+function createBillboard(texture: THREE.Texture) {
+    const material = new THREE.MeshBasicMaterial({ map: texture, color: 0xffffff });
+    const geometry = new THREE.PlaneGeometry(2, 2);
+    return new THREE.Mesh(geometry, material);
+}
+
+function billboardLookAt(mesh: THREE.Mesh, camera: THREE.Camera) {
+    const { x, y, z } = camera.position;
+    mesh.lookAt(x, y, z);
+}
 
 abstract class Entity {
     x: number;
@@ -34,16 +46,20 @@ abstract class Entity {
 }
 
 class Asteroid extends Entity {
+    mesh: THREE.Mesh<THREE.PlaneGeometry, THREE.MeshBasicMaterial, THREE.Object3DEventMap>;
+
     constructor(x: number, y: number) {
         super(x, y, randomBetween(5, 10));
         const geometry = new THREE.BoxGeometry();
         const material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
         const cube = new THREE.Mesh(geometry, material);
         game!.scene.add(cube);
+
+        this.mesh = createBillboard(game!.textures.asteroid_tex);
     }
 
     update(delta: number): void {
-        throw new Error("Method not implemented.");
+        billboardLookAt(this.mesh, game!.player.camera);
     }
 }
 
@@ -120,9 +136,16 @@ export const Game: React.FC = () => {
         // Create a scene
         const scene = new THREE.Scene();
 
+        const texLoader = new THREE.TextureLoader();
         game = {
             player: new Player(),
-            scene: scene
+            scene: scene,
+            asteroids: [],
+            textures: {
+                asteroid_tex: texLoader.load("/images/asteroid_1.png"),
+                earth_tex: texLoader.load('/images/earth.png'),
+                planet_tex: texLoader.load('/images/planet.png')
+            }
         }
 
         // Create a renderer
@@ -130,19 +153,21 @@ export const Game: React.FC = () => {
         renderer.setSize(window.innerWidth, window.innerHeight);
         document.body.appendChild(renderer.domElement);
 
-        // Add a cube
-        const geometry = new THREE.BoxGeometry();
-        const material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
-        const cube = new THREE.Mesh(geometry, material);
-        scene.add(cube);
+        // Add earth
+        const earth = createBillboard(game.textures.earth_tex);
+        scene.add(earth);
 
         // Animation loop
         function animate() {
             requestAnimationFrame(animate);
 
             const delta = 1 / 60;
-            game?.player.update(delta);
+            game!.player.update(delta);
+            game!.asteroids.forEach(asteroid => asteroid.update(delta));
 
+            billboardLookAt(earth, game!.player.camera);
+
+            renderer.setClearColor(0x111111);
             renderer.render(scene, game!.player.camera);
         }
         animate();
