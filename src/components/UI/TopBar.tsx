@@ -18,6 +18,8 @@ export const TopBar: FC<TopBarProps> = ({ shipSpeed, oxygenLevel, shipMaxSpeed }
 
     const percentage = Math.ceil(shipSpeed / shipMaxSpeed);
 
+    const oxygenLevelDisplay = Math.max(0, Math.ceil(oxygenLevel));
+
     const BarLabel: FC<{ children?: React.ReactNode }> = ({ children }) => {
         return <p style={{ textAlign: "center" }}>{children}</p>
     }
@@ -33,7 +35,7 @@ export const TopBar: FC<TopBarProps> = ({ shipSpeed, oxygenLevel, shipMaxSpeed }
             </div>
             <div className='oxygenLevel' style={{ width: "10rem" }}>
                 <BarLabel>Oxygen</BarLabel>
-                <CircularProgressbar value={Math.ceil(oxygenLevel)} text={`${Math.ceil(oxygenLevel)}%`} styles={circleStyles} />
+                <CircularProgressbar value={oxygenLevelDisplay} text={`${oxygenLevelDisplay}%`} styles={circleStyles} />
             </div>
         </div>
     )

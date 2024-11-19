@@ -420,10 +420,13 @@ export const Game: React.FC = () => {
 
             if (oxygenLoseTimer > 1) {
                 oxygenLoseTimer = 0;
-                setOxygen(oxygen => oxygen - 1);
-                if (oxygen <= 0) {
-                    lose();
-                }
+                setOxygen(oxygen => {
+                    const o = oxygen - 1
+                    if (oxygen <= 0) {
+                        lose();
+                    }
+                    return o;
+                });
             }
             oxygenLoseTimer += delta;
 
