@@ -28,7 +28,7 @@ export const BottomBar: FC<BottomBarProps> = ({HullHealth, Objectives}) => {
                 </ul>
             </div>
             <div className='HullHealth'>
-                <ProgressBar now={Health} label={`${Health}%`} style={{width: 200}} />
+                <ProgressBar now={Health} label={`${Math.round(Health)}%`} style={{width: 200}} />
             </div>
         </div>
     )
