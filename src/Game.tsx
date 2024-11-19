@@ -4,10 +4,6 @@ import * as THREE from 'three';
 import { randomBetween } from "./utils/helpers";
 import { DEG2RAD } from "three/src/math/MathUtils.js";
 import { UI } from "./UI";
-import { set } from "react-hook-form";
-import { FadeIn } from "./components/FadeIn";
-
-
 
 interface Game {
     player: Player;
@@ -23,10 +19,6 @@ interface Textures {
     asteroid_tex: THREE.Texture;
     earth_tex: THREE.Texture;
     planet_tex: THREE.Texture;
-}
-
-function getRandomAsteroid() {
-    return Asteroid;
 }
 
 const keysPressed: { [key: string]: boolean } = {};
