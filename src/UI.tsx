@@ -16,7 +16,7 @@ export const UI: FC<TopBarProps & ContentProps & BottomBarProps> = (props) => {
             }
         }>
             <TopBar shipSpeed={props.shipSpeed} oxygenLevel={props.oxygenLevel} shipMaxSpeed={props.shipMaxSpeed} />
-            <Content distance={props.distance} XCoordTrappist={props.XCoordTrappist} YCoordTrappist={props.YCoordTrappist} onWin={props.onWin}/>
+            <Content distance={props.distance} XCoordTrappist={props.XCoordTrappist} YCoordTrappist={props.YCoordTrappist} onWin={props.onWin} lost={props.lost} />
             <BottomBar HullHealth={props.HullHealth} Objectives={props.Objectives} />
         </div>
 

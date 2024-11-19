@@ -1,6 +1,7 @@
 import { FC, useEffect } from "react";
 import marker from '../../assets/images/marker.png';
 import { WinScreen } from "./WinScreen";
+import { GameOver } from "./GameOver";
 // import { setInterval } from "timers/promises";
 // x -> horizontal
 // y -> vertical
@@ -10,13 +11,18 @@ export interface ContentProps {
     distance: number;
     XCoordTrappist: number;
     YCoordTrappist: number;
+    lost: boolean;
     onWin: () => void;
 }
 
-export const Content: FC<ContentProps> = ({ distance, XCoordTrappist, YCoordTrappist, onWin }) => {
+export const Content: FC<ContentProps> = ({ distance, XCoordTrappist, YCoordTrappist, onWin, lost }) => {
     if (distance < 25) {
         onWin();
         return <WinScreen />;
+    }
+
+    if (lost) {
+        return <GameOver />;
     }
 
     return (

@@ -14,6 +14,7 @@ interface Game {
     earth: Planet | null,
     trappist: Planet | null,
     notPlayer: Entity[];
+    didLose: boolean;
 }
 
 interface Textures {
@@ -273,6 +274,9 @@ export const Game: React.FC = () => {
 
     const [speed, setSpeed] = useState<number>(0);
 
+    const [lost, setLost] = useState<boolean>(false);
+    const [won, setWon] = useState<boolean>(false);
+
     const shipMaxSpeed = 1;
 
     let shouldRun = true;
@@ -280,7 +284,13 @@ export const Game: React.FC = () => {
     function win() {
         console.log("You win!");
         shouldRun = false;
-        game?.player.velocity.set(0, 0);
+        setWon(true);
+    }
+
+    function lose() {
+        console.log("You lose!");
+        shouldRun = false;
+        setLost(true);
     }
 
     useEffect(() => {
@@ -309,7 +319,8 @@ export const Game: React.FC = () => {
             asteroids: [],
             earth: null,
             trappist: null,
-            notPlayer: []
+            notPlayer: [],
+            didLose: false
         }
 
         game.earth = new Planet(0, 0, textures.earth_tex);
@@ -342,7 +353,7 @@ export const Game: React.FC = () => {
             if (game?.trappist?.mesh.position) {
                 return game.player.camera.position.distanceTo(game.trappist.mesh.position);
             }
-            return 0;
+            return 999999;
         }
 
         let speedUpdateTimer = 0;
@@ -386,6 +397,14 @@ export const Game: React.FC = () => {
                 setOxygen(oxygen => oxygen - 1);
             }
             oxygenLoseTimer += delta;
+
+            if (game!.didLose) {
+                lose();
+                game!.player.velocity.set(0, 0);
+            }
+            if (won) {
+                game!.player.velocity.set(0, 0);
+            }
         }
         animate();
 
@@ -409,7 +428,7 @@ export const Game: React.FC = () => {
     return (
         <>
             <canvas ref={canvas} />
-            <UI shipSpeed={speed} oxygenLevel={oxygen} shipMaxSpeed={shipMaxSpeed} distance={distance} HullHealth={health} Objectives={["Navigate to TRAPPIST-1.", "Do not destroy your ship!", "Do not run out of oxygen!"]} XCoordTrappist={xCoordScreen} YCoordTrappist={yCoordScreen} onWin={win} />
+            <UI shipSpeed={speed} oxygenLevel={oxygen} shipMaxSpeed={shipMaxSpeed} distance={distance} HullHealth={health} Objectives={["Navigate to TRAPPIST-1.", "Do not destroy your ship!", "Do not run out of oxygen!"]} XCoordTrappist={xCoordScreen} YCoordTrappist={yCoordScreen} onWin={win} lost={lost} />
         </>
     )
 }
