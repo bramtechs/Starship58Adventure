@@ -5,13 +5,14 @@ import { randomBetween } from "./utils/helpers";
 import { DEG2RAD } from "three/src/math/MathUtils.js";
 import { UI } from "./UI";
 
+
 interface Game {
     player: Player;
     scene: THREE.Scene;
     asteroids: Asteroid[];
     earth: Planet | null,
     trappist: Planet | null,
-    notPlayer: Entity[],
+    notPlayer: Entity[];
 }
 
 interface Textures {
@@ -20,13 +21,17 @@ interface Textures {
     planet_tex: THREE.Texture;
 }
 
+function getRandomAsteroid() {
+    return Asteroid;
+}
+
 const keysPressed: { [key: string]: boolean } = {};
 let game: Game | null = null;
 let textures: Textures | null = null;
 
-function createBillboard(texture: THREE.Texture, size: number) {
-    const material = new THREE.MeshBasicMaterial({ map: texture, color: 0xffffff, transparent: true });
-    const geometry = new THREE.PlaneGeometry(size, size);
+function createBillboard(texture: THREE.Texture) {
+    const material = new THREE.MeshBasicMaterial({ map: texture, color: 0xffffff });
+    const geometry = new THREE.PlaneGeometry(2, 2);
     return new THREE.Mesh(geometry, material);
 }
 
@@ -55,6 +60,7 @@ function touchSphere(radius: number) {
     m.renderOrder = 1;
     return m;
 }
+
 
 abstract class Entity {
     x: number;
@@ -99,13 +105,12 @@ abstract class Entity {
     abstract update(delta: number): void;
 
 }
-
 class Asteroid extends Entity {
     mesh: THREE.Mesh<THREE.PlaneGeometry, THREE.MeshBasicMaterial, THREE.Object3DEventMap>;
 
     constructor(x: number, y: number) {
         super(x, y, randomBetween(5, 10));
-        this.mesh = createBillboard(textures!.asteroid_tex, this.radius);
+        this.mesh = createBillboard(textures!.asteroid_tex);
     }
 
     update(delta: number): void {
@@ -118,8 +123,8 @@ class Planet extends Entity {
     mesh: THREE.Mesh<THREE.PlaneGeometry, THREE.MeshBasicMaterial, THREE.Object3DEventMap>;
 
     constructor(x: number, y: number, texture: THREE.Texture) {
-        super(x, y, 30);
-        this.mesh = createBillboard(texture, this.radius);
+        super(x, y, 10);
+        this.mesh = createBillboard(texture);
         game!.scene.add(this.mesh);
         console.log("planet")
     }
@@ -216,12 +221,12 @@ class Player extends Entity {
 
         if (keysPressed['ArrowUp']) {
             thrust(baseThrust);
-            console.log(this.velocity);
+            //console.log(this.velocity);
         }
 
         if (keysPressed['ArrowDown']) {
             thrust(-baseThrust);
-            console.log(this.velocity);
+            //console.log(this.velocity);
         }
 
         // apply velocity
@@ -245,10 +250,13 @@ class Player extends Entity {
             }
         });
     }
+
+
+
 }
 
 export const Game: React.FC = () => {
-
+    let [distance, setDistance] = useState<number>(0);
     let canvas = useRef(null);
 
     const [health, setHealth] = useState<number>(100);
@@ -290,7 +298,6 @@ export const Game: React.FC = () => {
         game.earth = new Planet(0, 0, textures.earth_tex);
         game.trappist = new Planet(randomBetween(-500, 500), randomBetween(-500, 500), textures.planet_tex);
 
-
         // Create a renderer
         const renderer = new THREE.WebGLRenderer({ canvas: canvas.current as any });
         renderer.setSize(window.innerWidth, window.innerHeight);
@@ -305,6 +312,13 @@ export const Game: React.FC = () => {
 
         game.notPlayer = [game.earth, game.trappist, ...game.asteroids];
 
+        function distanceBetweenPlanet() {
+            if (game?.trappist?.mesh.position) {
+                return game.player.camera.position.distanceTo(game.trappist.mesh.position);
+            }
+            return 0;
+        }
+
         // Animation loop
         function animate() {
             requestAnimationFrame(animate);
@@ -314,6 +328,9 @@ export const Game: React.FC = () => {
             game!.asteroids.forEach(asteroid => asteroid.update(delta));
             game!.earth!.update(delta);
             game!.trappist!.update(delta);
+
+            const distance = distanceBetweenPlanet();
+            setDistance(distance);
 
             renderer.render(scene, game!.player.camera);
         }
@@ -327,6 +344,7 @@ export const Game: React.FC = () => {
 
         window.addEventListener('keydown', (event) => {
             keysPressed[event.key] = true;
+
         });
 
         window.addEventListener('keyup', (event) => {
@@ -338,7 +356,8 @@ export const Game: React.FC = () => {
     return (
         <>
             <canvas ref={canvas} />
-            <UI shipSpeed={speed} oxygenLevel={oxygen} shipMaxSpeed={shipMaxSpeed} />
+            <UI shipSpeed={speed} oxygenLevel={oxygen} shipMaxSpeed={shipMaxSpeed} distance={distance} HullHealth={health} Objectives={["Navigate to TRAPPIST-1.", "Do not destroy your ship!", "Do not run out of oxygen!"]} />
         </>
     )
 }
+

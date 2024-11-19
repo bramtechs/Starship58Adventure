@@ -1,18 +1,24 @@
-import { FC } from "react";
-
+import { FC, useEffect } from "react";
+import marker from '../../assets/images/marker.png';
+// import { setInterval } from "timers/promises";
 // x -> horizontal
 // y -> vertical
 // z -> depth -> size
 
-export const Content: FC = () => {
-    const positionPlanet = {x: 0, y: 0, z: 0};
+export interface ContentProps {
+    distance: number;
+}
+
+export const Content: FC<ContentProps> = ({distance}) => {
+    const positionPlanet = {x: 0, y: 0};
+    let interval = 1000;
+    useEffect(() => {
+        console.log(distance)
+    }, [distance]);
     
-    const convertToPositionOnUI = (position: {x: number, y: number, z: number}) => {
-        return {x: position.x, y: position.z};
-    }
     return (
-        <div style={{height:"60%"}}>
-            
+        <div>
+            <img src={marker} width={100} ></img>
         </div>
     );
 }

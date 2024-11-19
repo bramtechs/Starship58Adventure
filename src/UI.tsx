@@ -1,9 +1,9 @@
 import { FC } from 'react';
 import { TopBar, TopBarProps } from './components/UI/TopBar';
-import { BottomBar } from './components/UI/BottomBar';
-import { Content } from './components/UI/Content';
+import { BottomBar, BottomBarProps } from './components/UI/BottomBar';
+import { Content, ContentProps } from './components/UI/Content';
 
-export const UI: FC<TopBarProps> = (props) => {
+export const UI: FC<TopBarProps & ContentProps & BottomBarProps> = (props) => {
     return (
         <div style={
             {
@@ -16,8 +16,8 @@ export const UI: FC<TopBarProps> = (props) => {
             }
         }>
             <TopBar shipSpeed={props.shipSpeed} oxygenLevel={props.oxygenLevel} shipMaxSpeed={props.shipMaxSpeed} />
-            <Content />
-            <BottomBar />
+            <Content distance={props.distance} />
+            <BottomBar HullHealth={props.HullHealth} Objectives={props.Objectives} />
         </div>
 
 
