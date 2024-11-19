@@ -213,7 +213,6 @@ class Player extends Entity {
             this.angleDeg += rotSpeed * delta;
             //console.log(this.angleDeg);
         }
-
         const baseThrust = 10;
         const thrust = (a: number) => {
             this.velocity.x += Math.cos(this.angleDeg * DEG2RAD) * a * delta;
@@ -280,18 +279,19 @@ export const Game: React.FC = () => {
 
     const shipMaxSpeed = 1;
 
-    let shouldRun = true;
+    const [shouldRun, setShouldRun] = useState<boolean>(true);
 
     function win() {
         console.log("You win!");
-        shouldRun = false;
+        setShouldRun(false);
         setWon(true);
     }
 
     function lose() {
         console.log("You lose!");
-        shouldRun = false;
+        setShouldRun(false);
         setLost(true);
+        game!.didLose = true;
     }
 
     useEffect(() => {
@@ -312,6 +312,9 @@ export const Game: React.FC = () => {
         function onCrash(healthLost: number, oxygenLost: number) {
             setHealth(health => health - healthLost);
             setOxygen(oxygen => oxygen - oxygenLost);
+            if (health <= 0) {
+                lose();
+            }
         }
 
         game = {
@@ -325,7 +328,12 @@ export const Game: React.FC = () => {
         }
 
         game.earth = new Planet(0, 0, textures.earth_tex);
-        game.trappist = new Planet(randomBetween(-500, 500), randomBetween(-500, 500), textures.planet_tex);
+
+        const angle = randomBetween(0, 360);
+        const plX = Math.cos(angle * DEG2RAD) * 500;
+        const plZ = Math.sin(angle * DEG2RAD) * 500;
+
+        game.trappist = new Planet(plX, plZ, textures.planet_tex);
 
 
         // Create a renderer
@@ -362,11 +370,12 @@ export const Game: React.FC = () => {
 
         // Animation loop
         function animate() {
-            if (!shouldRun) return;
             requestAnimationFrame(animate);
 
             const delta = 1 / 60;
-            game!.player.update(delta);
+            if (!game!.didLose && !won) {
+                game!.player.update(delta);
+            }
             game!.asteroids.forEach(asteroid => asteroid.update(delta));
             game!.earth!.update(delta);
             game!.trappist!.update(delta);
@@ -396,14 +405,17 @@ export const Game: React.FC = () => {
             if (oxygenLoseTimer > 1) {
                 oxygenLoseTimer = 0;
                 setOxygen(oxygen => oxygen - 1);
+                if (oxygen <= 0) {
+                    lose();
+                }
             }
             oxygenLoseTimer += delta;
 
-            if (game!.didLose) {
+            if (game!.didLose || lost) {
                 lose();
                 game!.player.velocity.set(0, 0);
             }
-            if (won) {
+            if (!shouldRun) {
                 game!.player.velocity.set(0, 0);
             }
         }
@@ -417,7 +429,6 @@ export const Game: React.FC = () => {
 
         window.addEventListener('keydown', (event) => {
             keysPressed[event.key] = true;
-
         });
 
         window.addEventListener('keyup', (event) => {
@@ -430,7 +441,6 @@ export const Game: React.FC = () => {
         <>
             <canvas ref={canvas} />
             <UI shipSpeed={speed} oxygenLevel={oxygen} shipMaxSpeed={shipMaxSpeed} distance={distance} HullHealth={health} Objectives={["Navigate to TRAPPIST-1.", "Do not destroy your ship!", "Do not run out of oxygen!"]} XCoordTrappist={xCoordScreen} YCoordTrappist={yCoordScreen} onWin={win} lost={lost} />
-            <FadeIn />
         </>
     )
 }

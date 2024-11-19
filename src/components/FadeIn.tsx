@@ -14,5 +14,8 @@ export const FadeIn: FC = () => {
         }
     }, [])
 
-    return <div style={{ position: "absolute", width: "100vw", height: "100vh", "backgroundColor": "black", opacity: opacity }}></div>
+    if (opacity > 0.01) {
+        <div style={{ position: "absolute", width: "100vw", height: "100vh", "backgroundColor": "black", opacity: opacity, "userSelect": "none" }}></div>;
+    }
+    return <></>
 }
