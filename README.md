@@ -1,7 +1,7 @@
 # Starship 58 Adventure
 
 <a href="https://bramtechs.github.io/Starship58Adventure/" target="_blank">Play
-in your browser!</a>
+in your browser!</a> Use arrow keys to move around.
 
 Original code for a game programmed in 5 hours for
 [Hack The Future 2024](https://www.hackthefuture.be/), a Belgian Hackathon.
