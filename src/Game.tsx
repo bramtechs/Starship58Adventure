@@ -5,6 +5,7 @@ import { randomBetween } from "./utils/helpers";
 import { DEG2RAD } from "three/src/math/MathUtils.js";
 import { UI } from "./UI";
 import { set } from "react-hook-form";
+import { FadeIn } from "./components/FadeIn";
 
 
 interface Game {
@@ -429,6 +430,7 @@ export const Game: React.FC = () => {
         <>
             <canvas ref={canvas} />
             <UI shipSpeed={speed} oxygenLevel={oxygen} shipMaxSpeed={shipMaxSpeed} distance={distance} HullHealth={health} Objectives={["Navigate to TRAPPIST-1.", "Do not destroy your ship!", "Do not run out of oxygen!"]} XCoordTrappist={xCoordScreen} YCoordTrappist={yCoordScreen} onWin={win} lost={lost} />
+            <FadeIn />
         </>
     )
 }
