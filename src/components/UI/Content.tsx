@@ -1,18 +1,15 @@
 import { FC } from "react";
-
+import marker from '../../assets/images/marker.png';
 // x -> horizontal
 // y -> vertical
 // z -> depth -> size
 
 export const Content: FC = () => {
-    const positionPlanet = {x: 0, y: 0, z: 0};
-    
-    const convertToPositionOnUI = (position: {x: number, y: number, z: number}) => {
-        return {x: position.x, y: position.z};
-    }
+    const positionPlanet = {x: 0, y: 0};
+
     return (
-        <div style={{height:"60%"}}>
-            
+        <div>
+            <img src={marker} width={100} ></img>
         </div>
     );
 }

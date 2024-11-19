@@ -5,6 +5,8 @@ import { Content } from './components/UI/Content';
 
 export const UI: FC = () => {
     const speedShip = 69;
+    const HullHealth = 60;
+    const Objectives = ["Navigate to Trappist-1", "Collect samples", "Return to Earth"];
 
     return (
         <div style={
@@ -19,7 +21,7 @@ export const UI: FC = () => {
         }>
             <TopBar speedShip={speedShip} />
             <Content />
-            <BottomBar />
+            <BottomBar HullHealth={HullHealth} Objectives={Objectives}/>
         </div>
 
 

@@ -19,6 +19,14 @@ interface Textures {
     planet_tex: THREE.Texture;
 }
 
+interface GameProps {
+    setDistance: (distance: number) => void;
+}
+
+function getRandomAsteroid() {
+    return Asteroid1;
+}
+
 const keysPressed: { [key: string]: boolean } = {};
 let game: Game | null = null;
 let textures: Textures | null = null;
@@ -147,12 +155,12 @@ class Player extends Entity {
 
 }
 
-export const Game: React.FC = () => {
-
+export const Game: React.FC<GameProps> = () => {
+    
     let canvas = useRef(null);
 
     useEffect(() => {
-
+        
         if (game) return;
 
         // Create a scene
@@ -202,6 +210,12 @@ export const Game: React.FC = () => {
             renderer.render(scene, game!.player.camera);
         }
         animate();
+
+        // Calculate distance between two points
+        function distanceBetweenPlanet(){
+            return game?.player.camera.position.distanceTo(new THREE.Vector3(0, 0, 0));
+        }
+        setDistance(distanceBetweenPlanet);
 
         // Handle window resize
         window.addEventListener('resize', () => {
