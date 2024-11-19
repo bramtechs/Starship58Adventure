@@ -1,5 +1,6 @@
 import { FC, useEffect } from "react";
 import marker from '../../assets/images/marker.png';
+import { WinScreen } from "./WinScreen";
 // import { setInterval } from "timers/promises";
 // x -> horizontal
 // y -> vertical
@@ -14,8 +15,11 @@ export interface ContentProps {
 export const Content: FC<ContentProps> = ({ distance, XCoordTrappist, YCoordTrappist }) => {
 
     useEffect(() => {
-
     }, [distance]);
+
+    if(distance < 25){
+        return <WinScreen />;
+    }
 
     return (
         <div style={{ width: "5%", position: 'absolute', left: XCoordTrappist, top: YCoordTrappist }} >
