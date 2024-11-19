@@ -1,9 +1,10 @@
-import { useEffect, useRef } from "react"
+import { useEffect, useRef, useState } from "react"
 import * as THREE from 'three';
 
 import { randomBetween } from "./utils/helpers";
 import { DEG2RAD } from "three/src/math/MathUtils.js";
 import { UI } from "./UI";
+
 
 interface Game {
     player: Player;
@@ -19,12 +20,8 @@ interface Textures {
     planet_tex: THREE.Texture;
 }
 
-interface GameProps {
-    setDistance: (distance: number) => void;
-}
-
 function getRandomAsteroid() {
-    return Asteroid1;
+    return Asteroid;
 }
 
 const keysPressed: { [key: string]: boolean } = {};
@@ -136,12 +133,12 @@ class Player extends Entity {
 
         if (keysPressed['ArrowUp']) {
             thrust(baseThrust);
-            console.log(this.velocity);
+            //console.log(this.velocity);
         }
 
         if (keysPressed['ArrowDown']) {
             thrust(-baseThrust);
-            console.log(this.velocity);
+            //console.log(this.velocity);
         }
 
         // apply velocity
@@ -155,9 +152,17 @@ class Player extends Entity {
 
 }
 
-export const Game: React.FC<GameProps> = () => {
-    
+export const Game: React.FC = () => {
+    let [distance, setDistance] = useState<number>(0);
     let canvas = useRef(null);
+
+    // Calculate distance between two points
+    function distanceBetweenPlanet(){
+        if (game?.trappist?.mesh.position) {
+            return game.player.camera.position.distanceTo(game.trappist.mesh.position);
+        }
+        return 0;
+    }
 
     useEffect(() => {
         
@@ -197,6 +202,13 @@ export const Game: React.FC<GameProps> = () => {
             scene.add(asteroid.mesh);
         }
 
+        function distanceBetweenPlanet(){
+            if (game?.trappist?.mesh.position) {
+                return game.player.camera.position.distanceTo(game.trappist.mesh.position);
+            }
+            return 0;
+        }
+
         // Animation loop
         function animate() {
             requestAnimationFrame(animate);
@@ -207,15 +219,12 @@ export const Game: React.FC<GameProps> = () => {
             game!.earth!.update(delta);
             game!.trappist!.update(delta);
 
+            const distance = distanceBetweenPlanet();
+            setDistance(distance);
+
             renderer.render(scene, game!.player.camera);
         }
         animate();
-
-        // Calculate distance between two points
-        function distanceBetweenPlanet(){
-            return game?.player.camera.position.distanceTo(new THREE.Vector3(0, 0, 0));
-        }
-        setDistance(distanceBetweenPlanet);
 
         // Handle window resize
         window.addEventListener('resize', () => {
@@ -225,6 +234,7 @@ export const Game: React.FC<GameProps> = () => {
 
         window.addEventListener('keydown', (event) => {
             keysPressed[event.key] = true;
+
         });
 
         window.addEventListener('keyup', (event) => {
@@ -236,7 +246,8 @@ export const Game: React.FC<GameProps> = () => {
     return (
         <>
             <canvas ref={canvas} />
-            <UI />
+            <UI distanceObj={distanceBetweenPlanet()}/>
         </>
     )
 }
+

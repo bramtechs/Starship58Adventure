@@ -3,7 +3,11 @@ import { TopBar } from './components/UI/TopBar';
 import { BottomBar } from './components/UI/BottomBar';
 import { Content } from './components/UI/Content';
 
-export const UI: FC = () => {
+interface UIProps {
+    distanceObj: number;
+}
+
+export const UI: FC<UIProps> = ({distanceObj}) => {
     const speedShip = 69;
     const HullHealth = 60;
     const Objectives = ["Navigate to Trappist-1", "Collect samples", "Return to Earth"];
@@ -20,7 +24,7 @@ export const UI: FC = () => {
             }
         }>
             <TopBar speedShip={speedShip} />
-            <Content />
+            <Content distance={distanceObj}/>
             <BottomBar HullHealth={HullHealth} Objectives={Objectives}/>
         </div>
 
