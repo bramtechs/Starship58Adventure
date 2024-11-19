@@ -103,7 +103,7 @@ class Asteroid extends Entity {
     mesh: THREE.Mesh<THREE.PlaneGeometry, THREE.MeshBasicMaterial, THREE.Object3DEventMap>;
 
     constructor(x: number, y: number) {
-        super(x, y, randomBetween(1, 5));
+        super(x, y, randomBetween(1, 10));
         this.mesh = createBillboard(textures!.asteroid_tex, this.radius);
     }
 
@@ -300,12 +300,20 @@ export const Game: React.FC = () => {
         renderer.setSize(window.innerWidth, window.innerHeight);
         document.body.appendChild(renderer.domElement);
 
-        // Generate asteroids
-        for (let i = 0; i < 10; i++) {
-            const asteroid = new Asteroid(randomBetween(-50, 50), randomBetween(-50, 50));
+        const maxRange = 250;
+
+        // Generate asteroids around center point between earth and trappist
+        const centerX = (game.earth.x + game.trappist.x) / 2;
+        const centerZ = (game.earth.z + game.trappist.z) / 2;
+
+        for (let i = 0; i < 80; i++) {
+            const x = centerX + randomBetween(-maxRange, maxRange);
+            const z = centerZ + randomBetween(-maxRange, maxRange);
+            const asteroid = new Asteroid(x, z);
             game.asteroids.push(asteroid);
             scene.add(asteroid.mesh);
         }
+
 
         game.notPlayer = [game.earth, game.trappist, ...game.asteroids];
 
