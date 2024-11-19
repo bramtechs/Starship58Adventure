@@ -9,6 +9,8 @@ export interface BottomBarProps {
 
 export const BottomBar: FC<BottomBarProps> = ({ HullHealth, Objectives }) => {
 
+    const health = Math.ceil(Math.max(0, Math.min(100, HullHealth)));
+
     return (
         <div className="bottombar" style={{ display: "flex", justifyContent: "space-around", height: "20%", "width": "100vw", position: "absolute", bottom: 0 }}>
             <div className='Objective'>
@@ -20,7 +22,7 @@ export const BottomBar: FC<BottomBarProps> = ({ HullHealth, Objectives }) => {
                 </ul>
             </div>
             <div className='HullHealth'>
-                <ProgressBar now={HullHealth} label={`${Math.ceil(HullHealth)}%`} style={{ width: 300, height: 50, backgroundColor: "orange" }} variant="danger" />
+                <ProgressBar now={health} label={`${health}%`} style={{ width: 300, height: 50, backgroundColor: "orange" }} variant="danger" />
             </div>
         </div>
     )
