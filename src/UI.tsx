@@ -5,9 +5,10 @@ import { Content } from './components/UI/Content';
 
 interface UIProps {
     distanceObj: number;
+    XCoordinateTrappist: number;
 }
 
-export const UI: FC<UIProps> = ({distanceObj}) => {
+export const UI: FC<UIProps> = ({distanceObj, XCoordinateTrappist}) => {
     const speedShip = 69;
     const HullHealth = 60;
     const Objectives = ["Navigate to Trappist-1", "Collect samples", "Return to Earth"];
@@ -24,7 +25,7 @@ export const UI: FC<UIProps> = ({distanceObj}) => {
             }
         }>
             <TopBar speedShip={speedShip} />
-            <Content distance={distanceObj}/>
+            <Content distance={distanceObj} XCoordTrappist={XCoordinateTrappist}/>
             <BottomBar HullHealth={HullHealth} Objectives={Objectives}/>
         </div>
 
