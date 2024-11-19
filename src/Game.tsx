@@ -4,7 +4,7 @@ import * as THREE from 'three';
 import { randomBetween } from "./utils/helpers";
 import { DEG2RAD } from "three/src/math/MathUtils.js";
 import { UI } from "./UI";
-import { set } from "react-hook-form";
+
 
 
 interface Game {
@@ -156,7 +156,7 @@ class Player extends Entity {
             75, // Field of view
             window.innerWidth / window.innerHeight, // Aspect ratio
             0.1, // Near clipping plane
-            1000 // Far clipping plane
+            2000 // Far clipping plane
         );
     }
 
@@ -290,6 +290,18 @@ export const Game: React.FC = () => {
             planet_tex: texLoader.load('/images/planet.png')
         }
 
+
+        // Load skybox texture
+        const skyboxTexture = texLoader.load('/images/space-background.jpg');
+        const skyboxGeometry = new THREE.SphereGeometry(1000, 128, 128);
+        const skyboxMaterial = new THREE.MeshBasicMaterial({
+            map: skyboxTexture,
+            side: THREE.BackSide
+        });
+        const skybox = new THREE.Mesh(skyboxGeometry, skyboxMaterial);
+        scene.add(skybox);
+        
+
         function onCrash(healthLost: number, oxygenLost: number) {
             setHealth(health => health - healthLost);
             setOxygen(oxygen => oxygen - oxygenLost);
@@ -311,6 +323,7 @@ export const Game: React.FC = () => {
         // Create a renderer
         const renderer = new THREE.WebGLRenderer({ canvas: canvas.current as any });
         renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(window.devicePixelRatio);
         document.body.appendChild(renderer.domElement);
 
         const maxRange = 250;
@@ -326,7 +339,7 @@ export const Game: React.FC = () => {
             game.asteroids.push(asteroid);
             scene.add(asteroid.mesh);
         }
-
+        
 
         game.notPlayer = [game.earth, game.trappist, ...game.asteroids];
 
@@ -348,6 +361,8 @@ export const Game: React.FC = () => {
             game!.asteroids.forEach(asteroid => asteroid.update(delta));
             game!.earth!.update(delta);
             game!.trappist!.update(delta);
+
+            skybox.position.copy(game!.player.camera.position);
 
             //get distance between player and trappist
             const distance = distanceBetweenPlanet();
@@ -381,7 +396,6 @@ export const Game: React.FC = () => {
 
         window.addEventListener('keydown', (event) => {
             keysPressed[event.key] = true;
-
         });
 
         window.addEventListener('keyup', (event) => {
