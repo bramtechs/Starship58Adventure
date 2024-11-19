@@ -4,6 +4,8 @@ import * as THREE from 'three';
 import { randomBetween } from "./utils/helpers";
 import { DEG2RAD } from "three/src/math/MathUtils.js";
 import { UI } from "./UI";
+import { set } from "react-hook-form";
+import { FadeIn } from "./components/FadeIn";
 
 
 
@@ -14,6 +16,7 @@ interface Game {
     earth: Planet | null,
     trappist: Planet | null,
     notPlayer: Entity[];
+    didLose: boolean;
 }
 
 interface Textures {
@@ -31,11 +34,11 @@ let game: Game | null = null;
 let textures: Textures | null = null;
 
 function createBillboard(texture: THREE.Texture, radius: number) {
-    const material = new THREE.MeshBasicMaterial({ 
-        map: texture, 
-        color: 0xffffff, 
-        alphaTest: 0.5, 
-        transparent: true 
+    const material = new THREE.MeshBasicMaterial({
+        map: texture,
+        color: 0xffffff,
+        alphaTest: 0.5,
+        transparent: true
     });
     const geometry = new THREE.PlaneGeometry(radius * 2, radius * 2);
     return new THREE.Mesh(geometry, material);
@@ -263,7 +266,7 @@ class Player extends Entity {
 }
 
 export const Game: React.FC = () => {
-    let [distance, setDistance] = useState<number>(0);
+    let [distance, setDistance] = useState<number>(999999);
     let [xCoordScreen, setXCoordScreen] = useState<number>(0);
     let [yCoordScreen, setYCoordScreen] = useState<number>(0);
     let canvas = useRef(null);
@@ -273,7 +276,24 @@ export const Game: React.FC = () => {
 
     const [speed, setSpeed] = useState<number>(0);
 
+    const [lost, setLost] = useState<boolean>(false);
+    const [won, setWon] = useState<boolean>(false);
+
     const shipMaxSpeed = 1;
+
+    let shouldRun = true;
+
+    function win() {
+        console.log("You win!");
+        shouldRun = false;
+        setWon(true);
+    }
+
+    function lose() {
+        console.log("You lose!");
+        shouldRun = false;
+        setLost(true);
+    }
 
     useEffect(() => {
 
@@ -313,7 +333,8 @@ export const Game: React.FC = () => {
             asteroids: [],
             earth: null,
             trappist: null,
-            notPlayer: []
+            notPlayer: [],
+            didLose: false
         }
 
         game.earth = new Planet(0, 0, textures.earth_tex);
@@ -347,13 +368,15 @@ export const Game: React.FC = () => {
             if (game?.trappist?.mesh.position) {
                 return game.player.camera.position.distanceTo(game.trappist.mesh.position);
             }
-            return 0;
+            return 999999;
         }
 
         let speedUpdateTimer = 0;
+        let oxygenLoseTimer = 0;
 
         // Animation loop
         function animate() {
+            if (!shouldRun) return;
             requestAnimationFrame(animate);
 
             const delta = 1 / 60;
@@ -385,6 +408,20 @@ export const Game: React.FC = () => {
                 speedUpdateTimer = 0;
                 setSpeed(game!.player.velocity.length());
             }
+
+            if (oxygenLoseTimer > 1) {
+                oxygenLoseTimer = 0;
+                setOxygen(oxygen => oxygen - 1);
+            }
+            oxygenLoseTimer += delta;
+
+            if (game!.didLose) {
+                lose();
+                game!.player.velocity.set(0, 0);
+            }
+            if (won) {
+                game!.player.velocity.set(0, 0);
+            }
         }
         animate();
 
@@ -407,7 +444,8 @@ export const Game: React.FC = () => {
     return (
         <>
             <canvas ref={canvas} />
-            <UI shipSpeed={speed} oxygenLevel={oxygen} shipMaxSpeed={shipMaxSpeed} distance={distance} HullHealth={health} Objectives={["Navigate to TRAPPIST-1.", "Do not destroy your ship!", "Do not run out of oxygen!"]} XCoordTrappist={xCoordScreen} YCoordTrappist={yCoordScreen} />
+            <UI shipSpeed={speed} oxygenLevel={oxygen} shipMaxSpeed={shipMaxSpeed} distance={distance} HullHealth={health} Objectives={["Navigate to TRAPPIST-1.", "Do not destroy your ship!", "Do not run out of oxygen!"]} XCoordTrappist={xCoordScreen} YCoordTrappist={yCoordScreen} onWin={win} lost={lost} />
+            <FadeIn />
         </>
     )
 }
